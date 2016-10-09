@@ -126,7 +126,12 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url=''):
                 tags=tags,
                 prev_version=prev_version,
             )
-            cur_line = pretty_commit(commit, version_str, commit_type)
+            cur_line = pretty_commit(
+                commit=commit,
+                version=version_str,
+                commit_type=commit_type,
+                bugtracker_url=bugtracker_url,
+            )
             for child in children:
                 commit_type = get_commit_type(
                     commit=commit,
@@ -136,7 +141,8 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url=''):
                 cur_line += pretty_commit(
                     commit=child,
                     version=None,
-                    commit_type=commit_type
+                    commit_type=commit_type,
+                    bugtracker_url=bugtracker_url,
                 )
             start_including = True
             changelog.append(cur_line)
@@ -215,7 +221,7 @@ def get_authors(repo_path, from_commit=None):
 
 
 @_needs_git
-def get_releasenotes(repo_path, from_commit=None):
+def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
     """
     Given a repo and optionally a base revision to start from, will return
     a text suitable for the relase notes announcement, grouping the bugs, the
@@ -263,7 +269,11 @@ def get_releasenotes(repo_path, from_commit=None):
                 tags=tags,
                 prev_version=prev_version,
             )
-            cur_line = pretty_commit(commit, version_str, parent_commit_type)
+            cur_line = pretty_commit(
+                commit=commit,
+                version=version_str,
+                bugtracker_url=bugtracker_url,
+            )
             for child in children:
                 commit_type = get_commit_type(
                     commit=commit,
@@ -273,7 +283,8 @@ def get_releasenotes(repo_path, from_commit=None):
                 cur_line += pretty_commit(
                     commit=child,
                     version=None,
-                    commit_type=commit_type
+                    commit_type=commit_type,
+                    bugtracker_url=bugtracker_url,
                 )
             start_including = True
 

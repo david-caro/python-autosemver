@@ -89,7 +89,7 @@ def get_bugs_from_commit_msg(commit_msg):
         match = BUG_URL_REG.match(line.decode('utf-8'))
         if match:
             bugs.append(match.groupdict()['bugid'])
-    return ' '.join(bugs)
+    return bugs
 
 
 def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url=''):
@@ -99,9 +99,13 @@ def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url=''):
     author = commit.author  # noqa
     bugs = get_bugs_from_commit_msg(commit.message)
     if bugs:
-
         changelog_bugs = fit_to_cols(
-            'FIXED ISSUES: {bug_url}{bugs}'.format(**vars()),
+            'FIXED ISSUES: ' + ', '.join(
+                '{bugtracker_url}{bug}'.format(
+                    bugtracker_url=bugtracker_url,
+                    bug=bug,
+                ) for bug in bugs
+            ),
             indent='    ',
         ) + '\n'
     else:
