@@ -30,7 +30,8 @@ import os
 from . import api
 
 
-def get_current_version(project_name=None, project_dir=os.curdir):
+def get_current_version(project_name=None, project_dir=os.curdir,
+                        repo_dir=None):
     """
     Retrieves the version of the package, checking in this order of priority:
 
@@ -56,6 +57,7 @@ def get_current_version(project_name=None, project_dir=os.curdir):
             return os.environ[version_env_var]
 
     version = None
+    repo_dir = repo_dir or project_dir
     pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
     if os.path.exists(pkg_info_file):
         with open(pkg_info_file) as info_fd:
@@ -64,7 +66,7 @@ def get_current_version(project_name=None, project_dir=os.curdir):
                     version = line.split(' ', 1)[-1]
 
     else:
-        version = api.get_current_version(repo_path=project_dir)
+        version = api.get_current_version(repo_path=repo_dir)
 
     if version is None:
         raise RuntimeError('Failed to get package version')

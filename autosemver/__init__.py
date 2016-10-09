@@ -25,7 +25,6 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 import copy
-import os
 import sys
 
 import argparse
@@ -36,15 +35,8 @@ from autosemver.api import (
     get_current_version,
     get_releasenotes,
 )
-from .packaging import (
-    get_current_version as pkg_version,
-)
 
 PROJECT_NAME = 'python-autosemver'
-__version__ = pkg_version(
-    project_name=PROJECT_NAME,
-    project_dir=os.path.join(os.path.dirname(__file__), '..'),
-)
 
 
 def main(args=None):
