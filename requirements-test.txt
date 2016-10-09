@@ -1,0 +1,6 @@
+pytest>=3.0.3
+coverage
+pytest-cache>=1.0
+pytest-cov>=1.8.0
+pytest-pep8>=1.0.6
+-r requirements-docs.txt

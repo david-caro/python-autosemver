@@ -1,0 +1,2 @@
+Sphinx>=1.4.2
+-r requirements-build.txt
