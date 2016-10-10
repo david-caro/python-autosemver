@@ -137,7 +137,7 @@ def get_tags(repo):
         commit.decode('utf-8'): os.path.basename(tag_ref)
         for tag_ref, commit in repo.get_refs().items()
         if tag_ref.startswith(b'refs/tags/') and VALID_TAG.match(
-            tag_ref[len('refs/tags/'):]
+            tag_ref[len('refs/tags/'):].decode('utf-8')
         )
     }
 
