@@ -21,4 +21,31 @@
 Usage
 =====
 
+To use the automatic semantic versioning scheme, you just have to add some
+extra keywords to your `setup.py` file, in the call to the `distutils.setup`,
+and add `autosemver` to the `setup_requires` and `install_requires` entries::
+
+   setup(
+       name='some-package',
+       url='http://my.fancy/shrubbery',
+       ...
+       install_requires=['some_important_dep', 'autosemver'],
+       ...
+       setup_requires=['autosemver'],
+       ...
+       autosemver=True
+   )
+
+
+There is an optional key to specify the url of your bug tracker, currently only
+github and bugzilla bug specifications are supported, the key is
+`bugtracker_url` and you can use it like::
+
+   setup(
+       ...
+       bugtracker_url='https://github.com/david-caro/python-autosemver/issues/'
+       ...
+   )
+
+
 .. automodule:: autosemver
