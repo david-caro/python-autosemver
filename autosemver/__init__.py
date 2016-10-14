@@ -35,6 +35,11 @@ from autosemver.api import (
     get_current_version,
     get_releasenotes,
 )
+from autosemver.packaging import (
+    get_current_version as pkg_version,
+    create_authors,
+    create_changelog,
+)
 
 PROJECT_NAME = 'python-autosemver'
 
@@ -77,3 +82,15 @@ def main(args=None):
     params.pop('func')
 
     return args.func(**params)
+
+
+def distutils(dist, attr, value):
+    if attr != 'autosemver' or not value:
+        return
+
+    dist.metadata.version = pkg_version()
+    create_authors()
+
+    create_changelog(
+        bugtracker_url=getattr(dist.metadata, 'bugtracker_url', ''),
+    )

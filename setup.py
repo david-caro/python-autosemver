@@ -71,5 +71,6 @@ if __name__ == '__main__':
         version=__version__,
         entry_points={
             'console_scripts': 'autosemver=autosemver:main',
+            'distutils.setup_keywords': 'autosemver=autosemver:distutils',
         }
     )
