@@ -85,7 +85,12 @@ def main(args=None):
 
 
 def distutils(dist, attr, value):
-    if attr != 'autosemver' or not value:
+    if attr != 'autosemver':
+        if value:
+            setattr(dist.metadata, attr, value)
+            if getattr(dist.metadata, '_autosmever', ''):
+                create_changelog(bugtracker_url=value)
+
         return
 
     dist.metadata.version = pkg_version()
@@ -94,3 +99,5 @@ def distutils(dist, attr, value):
     create_changelog(
         bugtracker_url=getattr(dist.metadata, 'bugtracker_url', ''),
     )
+
+    dist.metadata._autosmever = True
