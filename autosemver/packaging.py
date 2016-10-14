@@ -126,3 +126,45 @@ def get_changelog(project_dir=os.curdir, bugtracker_url=''):
         )
 
     return changelog
+
+
+def create_authors(project_dir=os.curdir):
+    """
+    Creates the authors file, if not in a package.
+
+    Returns:
+        None
+
+    Raises:
+        RuntimeError: If the authors could not be retrieved
+    """
+    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    authors_file = os.path.join(project_dir, 'AUTHORS')
+    if os.path.exists(pkg_info_file):
+        return
+
+    with open(authors_file, 'w') as authors_fd:
+        authors_fd.write(
+            '\n'.join(get_authors(project_dir=project_dir)) + '\n'
+        )
+
+
+def create_changelog(project_dir=os.curdir, bugtracker_url=''):
+    """
+    Creates the changelog file, if not in a package.
+
+    Returns:
+        None
+
+    Raises:
+        RuntimeError: If the changelog could not be retrieved
+    """
+    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    if os.path.exists(pkg_info_file):
+        return
+
+    with open('CHANGELOG', 'w') as changelog_fd:
+        changelog_fd.write(get_changelog(
+            project_dir=project_dir,
+            bugtracker_url=bugtracker_url,
+        ))
