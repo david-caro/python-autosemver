@@ -81,7 +81,7 @@ def main(args=None):
     params = copy.deepcopy(vars(args))
     params.pop('func')
 
-    return args.func(**params)
+    print(args.func(**params))
 
 
 def distutils(dist, attr, value):
