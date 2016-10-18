@@ -33,6 +33,7 @@ repository.
 """
 from __future__ import print_function
 
+import datetime
 import os
 import re
 from collections import OrderedDict, defaultdict
@@ -92,11 +93,15 @@ def get_bugs_from_commit_msg(commit_msg):
     return bugs
 
 
-def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url=''):
+def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url='',
+                  rpm_format=False):
     message = commit.message.decode('utf-8')
     subject = commit.message.split(b'\n', 1)[0]  # noqa
     short_hash = commit.sha().hexdigest()[:8]  # noqa
     author = commit.author  # noqa
+    author_date = datetime.datetime.fromtimestamp(  # noqa
+            int(commit.commit_time)
+    ).strftime('%a %b %d %Y')
     bugs = get_bugs_from_commit_msg(commit.message)
     if bugs:
         changelog_bugs = fit_to_cols(
@@ -123,6 +128,14 @@ def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url=''):
         '{feature_header} {short_hash}: {subject}'.format(**vars()),
         indent='    ',
     )
+
+    if rpm_format:
+        return (
+            (
+                '* {author_date} {author} - {version}\n'
+                if version is not None else ''
+            ) + '{changelog_message}\n' + '{changelog_bugs}'
+        ).format(**vars())
 
     return (
         (

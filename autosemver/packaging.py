@@ -101,10 +101,16 @@ def get_authors(project_dir=os.curdir):
     return authors
 
 
-def get_changelog(project_dir=os.curdir, bugtracker_url=''):
+def get_changelog(project_dir=os.curdir, bugtracker_url='', rpm_format=False):
     """
     Retrieves the changelog, from the CHANGELOG file (if in a package) or
-    generates it from the git history.
+    generates it from the git history. Optionally in rpm-compatible format.
+
+    Args:
+        project_dir(str): Path to the git repo of the project.
+        bugtracker_url(str): Url to the bug tracker for the issues.
+        rpm_format(bool): if set to True, will make the changelog
+            rpm-compatible
 
     Returns:
         str: changelog
@@ -123,6 +129,7 @@ def get_changelog(project_dir=os.curdir, bugtracker_url=''):
         changelog = api.get_changelog(
             repo_path=project_dir,
             bugtracker_url=bugtracker_url,
+            rpm_format=rpm_format,
         )
 
     return changelog
@@ -149,9 +156,16 @@ def create_authors(project_dir=os.curdir):
         )
 
 
-def create_changelog(project_dir=os.curdir, bugtracker_url=''):
+def create_changelog(project_dir=os.curdir, bugtracker_url='',
+                     rpm_format=False):
     """
     Creates the changelog file, if not in a package.
+
+    Args:
+        project_dir(str): Path to the git repo of the project.
+        bugtracker_url(str): Url to the bug tracker for the issues.
+        rpm_format(bool): if set to True, will make the changelog
+            rpm-compatible
 
     Returns:
         None
@@ -167,4 +181,5 @@ def create_changelog(project_dir=os.curdir, bugtracker_url=''):
         changelog_fd.write(get_changelog(
             project_dir=project_dir,
             bugtracker_url=bugtracker_url,
+            rpm_format=rpm_format,
         ))
