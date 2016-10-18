@@ -50,7 +50,7 @@ def main(args=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'repo_path', help='Git repo to generate the changelog for'
+        'repo_path', help='Git repo to generate the changelog for.'
     )
     subparsers = parser.add_subparsers()
     changelog_parser = subparsers.add_parser('changelog')
@@ -59,6 +59,11 @@ def main(args=None):
         default=None,
         help='Commit to start the changelog from'
     )
+    changelog_parser.add_argument(
+        '--rpm-format',
+        action='store_true',
+        help='If set, the changelog will be rpm friendly.'
+    )
     changelog_parser.set_defaults(func=get_changelog)
     version_parser = subparsers.add_parser('version')
     version_parser.set_defaults(func=get_current_version)
@@ -66,14 +71,14 @@ def main(args=None):
     releasenotes_parser.add_argument(
         '--from-commit',
         default=None,
-        help='Commit to start the release notes from'
+        help='Commit to start the release notes from.'
     )
     releasenotes_parser.set_defaults(func=get_releasenotes)
     authors_parser = subparsers.add_parser('authors')
     authors_parser.add_argument(
         '--from-commit',
         default=None,
-        help='Commit to start the authors from'
+        help='Commit to start the authors from.'
     )
     authors_parser.set_defaults(func=get_authors)
     args = parser.parse_args(args)

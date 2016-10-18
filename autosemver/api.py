@@ -73,7 +73,8 @@ def _needs_git(func):
 
 
 @_needs_git
-def get_changelog(repo_path, from_commit=None, bugtracker_url=''):
+def get_changelog(repo_path, from_commit=None, bugtracker_url='',
+                  rpm_format=False):
     """
     Given a repo path and an option commit/tag/refspec to start from, will
     get the rpm compatible changelog
@@ -82,6 +83,8 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url=''):
         repo_path (str): path to the git repo
         from_commit (str): refspec (partial commit hash, tag, branch, full
         refspec, partial refspec) to start the changelog from
+        rpm_format(bool): if set, the changelog will be suitable to be uses as
+        rpm package changelog.
 
     Returns:
         str: Rpm compatible changelog
@@ -131,6 +134,7 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url=''):
                 version=version_str,
                 commit_type=commit_type,
                 bugtracker_url=bugtracker_url,
+                rpm_format=rpm_format,
             )
             for child in children:
                 commit_type = get_commit_type(
