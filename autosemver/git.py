@@ -169,7 +169,9 @@ def get_children_per_parent(repo_path):
 
     for entry in repo.get_walker(order=dulwich.walk.ORDER_TOPO):
         for parent in entry.commit.parents:
-            children_per_parent[parent].add(entry.commit.sha().hexdigest())
+            children_per_parent[parent.decode('utf-8')].add(
+                entry.commit.sha().hexdigest()
+            )
 
     return children_per_parent
 
@@ -223,13 +225,14 @@ def get_merged_commits(repo, commit, first_parents, children_per_parent):
         if (
             next_sha not in first_parents and not has_firstparent_child(
                 next_sha, first_parents, children_per_parent
-            ) or next_sha in commit.parents
+            ) or next_sha.encode('utf-8') in commit.parents
         ):
             merge_children.add(next_sha)
 
         non_first_parents = (
             parent
-            for parent in next_commit.parents if parent not in first_parents
+            for parent in next_commit.parents
+            if parent.decode() not in first_parents
         )
         for child_sha in non_first_parents:
             if child_sha not in merge_children and child_sha != next_sha:
