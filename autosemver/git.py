@@ -54,6 +54,18 @@ MAJOR_HEADER = re.compile(r'\nsem-ver:\s*.*break.*\n', flags=re.IGNORECASE)
 MAJOR_MSG = re.compile(r'\n\* INCOMPATIBLE')
 
 
+def _to_str(maybe_str):
+    try:
+        maybe_str = maybe_str.decode('utf-8')
+    except (UnicodeDecodeError, AttributeError):
+        try:
+            maybe_str = maybe_str.encode('utf-8').decode('utf-8')
+        except (UnicodeDecodeError, AttributeError):
+            pass
+
+    return maybe_str
+
+
 def get_repo_object(repo, object_name):
     try:
         object_name = object_name.encode()
@@ -86,8 +98,8 @@ def fit_to_cols(what, indent, cols=79):
 
 def get_bugs_from_commit_msg(commit_msg):
     bugs = []
-    for line in commit_msg.split(b'\n'):
-        match = BUG_URL_REG.match(line.decode('utf-8'))
+    for line in _to_str(commit_msg).split('\n'):
+        match = BUG_URL_REG.match(_to_str(line))
         if match:
             bugs.append(match.groupdict()['bugid'])
     return bugs
@@ -95,10 +107,10 @@ def get_bugs_from_commit_msg(commit_msg):
 
 def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url='',
                   rpm_format=False):
-    message = commit.message.decode('utf-8')
-    subject = commit.message.split(b'\n', 1)[0]  # noqa
+    message = _to_str(commit.message)
+    subject = _to_str(commit.message).split('\n', 1)[0]  # noqa
     short_hash = commit.sha().hexdigest()[:8]  # noqa
-    author = commit.author  # noqa
+    author = _to_str(commit.author)  # noqa
     author_date = datetime.datetime.fromtimestamp(  # noqa
             int(commit.commit_time)
     ).strftime('%a %b %d %Y')
@@ -132,27 +144,29 @@ def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url='',
     if rpm_format:
         return (
             (
-                '* {author_date} {author} - {version}\n'
+                u'* {author_date} {author} - {version}\n'
                 if version is not None else ''
             ) + '{changelog_message}\n' + '{changelog_bugs}'
         ).format(**vars())
 
     return (
         (
-            '* {version} "{author}"\n'
+            u'* {version} "{author}"\n'
             if version is not None else ''
         ) + '{changelog_message}\n' + '{changelog_bugs}'
     ).format(**vars())
 
 
 def get_tags(repo):
-    return {
-        commit.decode('utf-8'): os.path.basename(tag_ref)
-        for tag_ref, commit in repo.get_refs().items()
-        if tag_ref.startswith(b'refs/tags/') and VALID_TAG.match(
-            tag_ref[len('refs/tags/'):].decode('utf-8')
-        )
-    }
+    tags = {}
+    for tag_ref, commit in repo.get_refs().items():
+        tag_ref = _to_str(tag_ref)
+        if tag_ref.startswith('refs/tags/') and VALID_TAG.match(
+            tag_ref[len('refs/tags/'):]
+        ):
+            tags[_to_str(commit)] = os.path.basename(tag_ref)
+
+    return tags
 
 
 def get_refs(repo):
@@ -165,7 +179,7 @@ def get_refs(repo):
 
 def fuzzy_matches_ref(fuzzy_ref, ref):
     cur_section = ''
-    for path_section in reversed(ref.split(b'/')):
+    for path_section in reversed(_to_str(ref).split('/')):
         cur_section = os.path.normpath(os.path.join(path_section, cur_section))
         if fuzzy_ref == cur_section:
             return True
@@ -182,7 +196,7 @@ def get_children_per_parent(repo_path):
 
     for entry in repo.get_walker(order=dulwich.walk.ORDER_TOPO):
         for parent in entry.commit.parents:
-            children_per_parent[parent.decode('utf-8')].add(
+            children_per_parent[_to_str(parent)].add(
                 entry.commit.sha().hexdigest()
             )
 
@@ -198,8 +212,7 @@ def get_first_parents(repo_path):
     for entry in repo.get_walker(order=dulwich.walk.ORDER_TOPO):
         commit = entry.commit
         # In order to properly work on python 2 and 3 we need some utf magic
-        parents = commit.parents and [i.decode('utf-8') for i in
-                                      commit.parents]
+        parents = commit.parents and [_to_str(i) for i in commit.parents]
         if not parents:
             if commit.sha().hexdigest() not in first_parents:
                 first_parents.append(commit.sha().hexdigest())
@@ -245,7 +258,7 @@ def get_merged_commits(repo, commit, first_parents, children_per_parent):
         non_first_parents = (
             parent
             for parent in next_commit.parents
-            if parent.decode() not in first_parents
+            if _to_str(parent) not in first_parents
         )
         for child_sha in non_first_parents:
             if child_sha not in merge_children and child_sha != next_sha:
@@ -286,7 +299,7 @@ def get_version(commit, tags, maj_version=0, feat_version=0, fix_version=0,
     commit_sha = commit.sha().hexdigest()
 
     if commit_sha in tags:
-        maj_version, feat_version = tags[commit_sha].split(b'.')
+        maj_version, feat_version = tags[commit_sha].split('.')
         maj_version = int(maj_version)
         feat_version = int(feat_version)
         fix_version = 0
@@ -306,15 +319,15 @@ def get_version(commit, tags, maj_version=0, feat_version=0, fix_version=0,
 
 def is_api_break(commit):
     return (
-        MAJOR_HEADER.search(commit.message.decode('utf-8')) or
-        MAJOR_MSG.search(commit.message.decode('utf-8'))
+        MAJOR_HEADER.search(_to_str(commit.message)) or
+        MAJOR_MSG.search(_to_str(commit.message))
     )
 
 
 def is_feature(commit):
     return (
-        FEAT_HEADER.search(commit.message.decode('utf-8')) or
-        FEAT_MSG.search(commit.message.decode('utf-8'))
+        FEAT_HEADER.search(_to_str(commit.message)) or
+        FEAT_MSG.search(_to_str(commit.message))
     )
 
 
@@ -325,7 +338,7 @@ def get_commit_type(commit, children=None, tags=None, prev_version=None):
     commit_sha = commit.sha().hexdigest()
 
     if commit_sha in tags:
-        maj_version, feat_version = tags[commit_sha].split(b'.')
+        maj_version, feat_version = tags[commit_sha].split('.')
         maj_version = int(maj_version)
         feat_version = int(feat_version)
         if maj_version > prev_version[0]:

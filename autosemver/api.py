@@ -43,6 +43,7 @@ except ImportError:
     WITH_GIT = False
 
 from .git import (  # noqa
+    _to_str,
     get_tags,
     get_refs,
     get_children_per_first_parent,
@@ -215,9 +216,9 @@ def get_authors(repo_path, from_commit=None):
             start_including or commit_sha.startswith(from_commit) or
             fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
         ):
-            authors.add(commit.author.decode())
+            authors.add(_to_str(commit.author))
             for child in children:
-                authors.add(child.author.decode())
+                authors.add(_to_str(child.author))
 
             start_including = True
 
