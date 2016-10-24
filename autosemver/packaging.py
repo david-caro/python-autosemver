@@ -73,7 +73,7 @@ def get_current_version(project_name=None, project_dir=os.curdir,
 
     # py3 compatibility step
     if not isinstance(version, str) and isinstance(version, bytes):
-        version = version.decode()
+        version = api._to_str(version)
 
     return version
 
@@ -150,10 +150,9 @@ def create_authors(project_dir=os.curdir):
     if os.path.exists(pkg_info_file):
         return
 
-    with open(authors_file, 'w') as authors_fd:
-        authors_fd.write(
-            '\n'.join(get_authors(project_dir=project_dir)) + '\n'
-        )
+    authors = get_authors(project_dir=project_dir)
+    with open(authors_file, 'wb') as authors_fd:
+        authors_fd.write('\n'.join(a.encode('utf-8') for a in authors))
 
 
 def create_changelog(project_dir=os.curdir, bugtracker_url='',
@@ -182,4 +181,4 @@ def create_changelog(project_dir=os.curdir, bugtracker_url='',
             project_dir=project_dir,
             bugtracker_url=bugtracker_url,
             rpm_format=rpm_format,
-        ))
+        ).encode('utf-8'))
