@@ -80,7 +80,9 @@ def main(args=None):
         default=None,
         help='Commit to start the authors from.'
     )
-    authors_parser.set_defaults(func=get_authors)
+    authors_parser.set_defaults(
+        func=lambda *args, **kwargs: '\n'.join(get_authors(*args, **kwargs))
+    )
     args = parser.parse_args(args)
 
     params = copy.deepcopy(vars(args))
