@@ -57,10 +57,10 @@ MAJOR_MSG = re.compile(r'\n\* INCOMPATIBLE')
 def _to_str(maybe_str):
     try:
         maybe_str = maybe_str.decode('utf-8')
-    except (UnicodeDecodeError, AttributeError):
+    except (UnicodeDecodeError, UnicodeEncodeError, AttributeError):
         try:
             maybe_str = maybe_str.encode('utf-8').decode('utf-8')
-        except (UnicodeDecodeError, AttributeError):
+        except (UnicodeDecodeError, UnicodeEncodeError, AttributeError):
             pass
 
     return maybe_str
