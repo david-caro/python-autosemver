@@ -278,7 +278,11 @@ def get_children_per_first_parent(repo_path):
     children_per_first_parent = OrderedDict()
 
     for first_parent in first_parents:
-        commit = get_repo_object(repo, first_parent)
+        try:
+            commit = get_repo_object(repo, first_parent)
+        except KeyError:
+            continue
+
         if len(commit.parents) > 1:
             children = get_merged_commits(
                 repo=repo,
