@@ -247,7 +247,11 @@ def get_merged_commits(repo, commit, first_parents, children_per_parent):
 
     while to_explore:
         next_sha = to_explore.pop()
-        next_commit = get_repo_object(repo, next_sha)
+        try:
+            next_commit = get_repo_object(repo, next_sha)
+        except KeyError:
+            continue
+
         if (
             next_sha not in first_parents and not has_firstparent_child(
                 next_sha, first_parents, children_per_parent
