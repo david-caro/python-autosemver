@@ -27,6 +27,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 import os
+import pkg_resources
+
 from . import api
 
 
@@ -65,8 +67,20 @@ def get_current_version(project_name=None, project_dir=os.curdir,
                 if line.startswith('Version: '):
                     version = line.split(' ', 1)[-1]
 
-    else:
-        version = api.get_current_version(repo_path=repo_dir)
+    if version is None:
+        try:
+            version = api.get_current_version(repo_path=repo_dir)
+        except:
+            pass
+
+    if version is None:
+        if project_name:
+            try:
+                version = (
+                    pkg_resources.get_distribution(project_name).split(' ')[0]
+                )
+            except:
+                pass
 
     if version is None:
         raise RuntimeError('Failed to get package version')
@@ -177,8 +191,10 @@ def create_changelog(project_dir=os.curdir, bugtracker_url='',
         return
 
     with open('CHANGELOG', 'w') as changelog_fd:
-        changelog_fd.write(get_changelog(
-            project_dir=project_dir,
-            bugtracker_url=bugtracker_url,
-            rpm_format=rpm_format,
-        ).encode('utf-8'))
+        changelog_fd.write(
+            get_changelog(
+                project_dir=project_dir,
+                bugtracker_url=bugtracker_url,
+                rpm_format=rpm_format,
+            ).encode('utf-8')
+        )
