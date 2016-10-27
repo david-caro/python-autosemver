@@ -137,7 +137,7 @@ def pretty_commit(commit, version=None, commit_type='bug', bugtracker_url='',
         feature_header = 'MINOR'
 
     changelog_message = fit_to_cols(  # noqa
-        '{feature_header} {short_hash}: {subject}'.format(**vars()),
+        u'{feature_header} {short_hash}: {subject}'.format(**vars()),
         indent='    ',
     )
 
