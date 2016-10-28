@@ -166,7 +166,9 @@ def create_authors(project_dir=os.curdir):
 
     authors = get_authors(project_dir=project_dir)
     with open(authors_file, 'wb') as authors_fd:
-        authors_fd.write('\n'.join(a.encode('utf-8') for a in authors))
+        authors_fd.write(
+            b'\n'.join(a.encode('utf-8') for a in authors)
+        )
 
 
 def create_changelog(project_dir=os.curdir, bugtracker_url='',
@@ -190,7 +192,7 @@ def create_changelog(project_dir=os.curdir, bugtracker_url='',
     if os.path.exists(pkg_info_file):
         return
 
-    with open('CHANGELOG', 'w') as changelog_fd:
+    with open('CHANGELOG', 'wb') as changelog_fd:
         changelog_fd.write(
             get_changelog(
                 project_dir=project_dir,
