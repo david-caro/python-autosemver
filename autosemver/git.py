@@ -78,12 +78,17 @@ def get_repo_object(repo, object_name):
 def fit_to_cols(what, indent, cols=79):
     lines = []
     free_cols = cols - len(indent)
+    has_indent = False
     while len(what) > free_cols and ' ' in what.lstrip():
         cutpoint = free_cols
         extra_indent = ''
         if what[free_cols] != ' ':
             try:
-                prev_space = what[:free_cols].rindex(' ')
+                if has_indent:
+                    prev_space = what[len(has_indent):free_cols].rindex(' ')
+                else:
+                    prev_space = what[:free_cols].rindex(' ')
+
                 lines.append(indent + what[:prev_space])
                 cutpoint = prev_space + 1
                 extra_indent = '          '
@@ -92,6 +97,8 @@ def fit_to_cols(what, indent, cols=79):
         else:
             lines.append(indent + what[:free_cols])
         what = extra_indent + what[cutpoint:]
+        if extra_indent:
+            has_indent = extra_indent
     lines.append(indent + what)
     return '\n'.join(lines)
 
