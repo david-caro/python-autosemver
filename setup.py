@@ -62,6 +62,7 @@ if __name__ == '__main__':
     setup(
         author='David Caro',
         author_email='david@dcaro.es',
+        description='Tools to handle automatic semantic versioning in python',
         install_requires=['dulwich'],
         license='GPLv3',
         name='autosemver',
