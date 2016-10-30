@@ -25,8 +25,8 @@ pytest \
     --cov-report=term-missing \
     -vv \
     "$@" \
-    tests \
+    tests/unit \
     autosemver && \
 sphinx-build -qnN docs docs/_build/html && \
-sphinx-build -qnN -b doctest docs docs/_build/doctest
+bats tests/functional/*test.sh
 

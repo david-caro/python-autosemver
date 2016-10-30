@@ -29,13 +29,14 @@ import sys
 
 import argparse
 
-from autosemver.api import (
+from .api import (
     get_authors,
     get_changelog,
     get_current_version,
     get_releasenotes,
 )
-from autosemver.packaging import (
+from .git import _to_str
+from .packaging import (
     get_current_version as pkg_version,
     create_authors,
     create_changelog,
@@ -88,7 +89,7 @@ def main(args=None):
     params = copy.deepcopy(vars(args))
     params.pop('func')
 
-    print(args.func(**params))
+    print(_to_str(args.func(**params)))
 
 
 def distutils(dist, attr, value):

@@ -1,6 +1,6 @@
 notifications:
   email: false
-sudo: false
+sudo: true
 language: python
 matrix:
   fast_finish: true
@@ -11,6 +11,9 @@ python:
   - '3.5'
 
 before_install:
+  - sudo add-apt-repository ppa:duggan/bats --yes
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq bats tree git
   - travis_retry pip install --upgrade pip setuptools py
   - travis_retry pip install -r requirements-test.txt
   - pip freeze
