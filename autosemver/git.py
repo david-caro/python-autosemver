@@ -55,11 +55,19 @@ MAJOR_MSG = re.compile(r'\n\* INCOMPATIBLE')
 
 
 def _to_str(maybe_str):
+    # python3 support magic
     try:
-        maybe_str = maybe_str.decode('utf-8')
-    except (UnicodeDecodeError, UnicodeEncodeError, AttributeError):
+        assert isinstance(u'', str)
+        unicode = type(None)
+    except AssertionError:
+        unicode = type(u'')
+
+    if isinstance(maybe_str, unicode):
+        maybe_str = maybe_str.encode('utf-8')
+
+    else:
         try:
-            maybe_str = maybe_str.encode('utf-8').decode('utf-8')
+            maybe_str = maybe_str.decode('utf-8')
         except (UnicodeDecodeError, UnicodeEncodeError, AttributeError):
             pass
 

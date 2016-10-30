@@ -302,7 +302,7 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
 
         prev_version = version
 
-    return '''
+    return u'''
 New changes for version %s
 =================================
 
