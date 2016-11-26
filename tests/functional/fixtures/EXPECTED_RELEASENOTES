@@ -1,35 +1,152 @@
+New changes for version 6.2.3
+=================================
 
-New changes for version 2.0.0
+API Breaking changes
+--------------------
+* 6.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR 5717861b: Mèssage with ûtf-8 ßtuff
+
+New features
+------------
+* 6.2.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE 102f8c09: Mèssage with ûtf-8 ßtuff
+
+* 6.1.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE b1594a0d: Mèssage with ûtf-8 ßtuff
+
+Bugfixes and minor changes
+--------------------------
+* 6.2.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR 67bcba68: Mèssage with ûtf-8 ßtuff
+    FIXED ISSUES: 42
+
+* 6.2.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR c8eb802a: Mèssage with ûtf-8 ßtuff
+
+* 6.2.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR f1aa044a: Mèssage with ûtf-8 ßtuff
+
+
+New changes for version 5.0.0
+=================================
+
+API Breaking changes
+--------------------
+* 5.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR fec6e3cf: Mèssage with ûtf-8 ßtuff
+
+New features
+------------
+No new features
+
+Bugfixes and minor changes
+--------------------------
+No new bugs
+
+
+New changes for version 4.0.3
+=================================
+
+API Breaking changes
+--------------------
+* 4.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR 8ad043f0: Mèssage with ûtf-8 ßtuff
+
+New features
+------------
+No new features
+
+Bugfixes and minor changes
+--------------------------
+* 4.0.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR 5bdd63db: Mèssage with ûtf-8 ßtuff
+    FIXED ISSUES: 42
+
+* 4.0.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR c3b922aa: Mèssage with ûtf-8 ßtuff
+
+* 4.0.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR cbc7bd47: Mèssage with ûtf-8 ßtuff
+
+
+New changes for version 3.0.0
+=================================
+
+API Breaking changes
+--------------------
+* 3.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR 29cceb00: Mèssage with ûtf-8 ßtuff
+
+New features
+------------
+No new features
+
+Bugfixes and minor changes
+--------------------------
+No new bugs
+
+
+New changes for version 2.2.0
 =================================
 
 API Breaking changes
 --------------------
 * 2.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 3f0f3a71: Mèssage with ûtf-8 ßtuff
+    MAJOR 4f411e19: Mèssage with ûtf-8 ßtuff
 
+New features
+------------
+* 2.2.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE acd10f08: Mèssage with ûtf-8 ßtuff
+
+* 2.1.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE 68c3e431: Mèssage with ûtf-8 ßtuff
+
+Bugfixes and minor changes
+--------------------------
+No new bugs
+
+
+New changes for version 1.0.0
+=================================
+
+API Breaking changes
+--------------------
 * 1.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 1c416ae0: Mèssage with ûtf-8 ßtuff
+    MAJOR 14aa331f: Mèssage with ûtf-8 ßtuff
 
+New features
+------------
+No new features
+
+Bugfixes and minor changes
+--------------------------
+No new bugs
+
+
+New changes for version 0.2.0
+=================================
+
+API Breaking changes
+--------------------
+No new API breaking changes
 
 New features
 ------------
 * 0.2.0 "author2 <wöndérfûl@éma.il>"
-    MINOR 485189f4: Mèssage with ûtf-8 ßtuff
+    FEATURE a91ccf6f: Mèssage with ûtf-8 ßtuff
 
 * 0.1.0 "author2 <wöndérfûl@éma.il>"
-    MINOR 56e818b9: Mèssage with ûtf-8 ßtuff
-
+    FEATURE 01da9a07: Mèssage with ûtf-8 ßtuff
 
 Bugfixes and minor changes
 --------------------------
 * 0.0.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 7df31cc9: Mèssage with ûtf-8 ßtuff
+    MINOR 2aaa8162: Mèssage with ûtf-8 ßtuff
     FIXED ISSUES: 42
 
 * 0.0.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR d7d7bca4: Mèssage with ûtf-8 ßtuff
+    MINOR 0082c1d0: Mèssage with ûtf-8 ßtuff
 
 * 0.0.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR c60197b1: Mèssage with ûtf-8 ßtuff
-
-
+    MINOR 7366c308: Mèssage with ûtf-8 ßtuff

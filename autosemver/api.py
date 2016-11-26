@@ -33,6 +33,7 @@ repository.
 """
 from __future__ import print_function
 
+from collections import OrderedDict
 from functools import wraps
 
 WITH_GIT = True
@@ -239,15 +240,17 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
     feat_version = 0
     fix_version = 0
     start_including = False
-    bugs = []
-    features = []
-    api_break_changes = []
+    release_notes_per_major = OrderedDict()
 
     cur_line = ''
     if from_commit is None:
         start_including = True
 
     prev_version = (maj_version, feat_version, fix_version)
+    prev_version_str = '%s.%s.%s' % prev_version
+    bugs = []
+    features = []
+    api_break_changes = []
 
     for commit_sha, children in reversed(
         get_children_per_first_parent(repo_path).items()
@@ -268,6 +271,8 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
             start_including or commit_sha.startswith(from_commit) or
             fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
         ):
+            start_including = True
+
             parent_commit_type = get_commit_type(
                 commit=commit,
                 children=children,
@@ -278,6 +283,7 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
                 commit=commit,
                 version=version_str,
                 bugtracker_url=bugtracker_url,
+                commit_type=parent_commit_type,
             )
             for child in children:
                 commit_type = get_commit_type(
@@ -291,9 +297,14 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
                     commit_type=commit_type,
                     bugtracker_url=bugtracker_url,
                 )
-            start_including = True
 
             if parent_commit_type == 'api_break':
+                release_notes_per_major[prev_version_str] = (
+                    api_break_changes,
+                    features,
+                    bugs,
+                )
+                bugs, features, api_break_changes = [], [], []
                 api_break_changes.append(cur_line)
             elif parent_commit_type == 'feature':
                 features.append(cur_line)
@@ -301,25 +312,38 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
                 bugs.append(cur_line)
 
         prev_version = version
+        prev_version_str = version_str
 
-    return u'''
-New changes for version %s
+    release_notes_per_major[prev_version_str] = (
+        api_break_changes,
+        features,
+        bugs,
+    )
+
+    releasenotes = ''
+    for major_version, lines in reversed(release_notes_per_major.items()):
+        api_break_changes, features, bugs = lines
+        releasenotes += u'''New changes for version %s
 =================================
 
 API Breaking changes
 --------------------
 %s
-
 New features
 ------------
 %s
-
 Bugfixes and minor changes
 --------------------------
 %s
+
 ''' % (
-            version_str,
-            '\n'.join(reversed(api_break_changes)),
-            '\n'.join(reversed(features)),
-            '\n'.join(reversed(bugs)),
-        )
+                major_version,
+                (
+                    '\n'.join(reversed(api_break_changes)) or
+                    'No new API breaking changes\n'
+                ),
+                '\n'.join(reversed(features)) or 'No new features\n',
+                '\n'.join(reversed(bugs)) or 'No new bugs\n',
+            )
+
+    return releasenotes.strip()
