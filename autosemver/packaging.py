@@ -120,17 +120,14 @@ def get_changelog(project_dir=os.curdir, bugtracker_url='', rpm_format=False):
     Retrieves the changelog, from the CHANGELOG file (if in a package) or
     generates it from the git history. Optionally in rpm-compatible format.
 
-    Args:
-        project_dir(str): Path to the git repo of the project.
-        bugtracker_url(str): Url to the bug tracker for the issues.
-        rpm_format(bool): if set to True, will make the changelog
-            rpm-compatible
-
-    Returns:
-        str: changelog
-
-    Raises:
-        RuntimeError: If the changelog could not be retrieved
+    :param project_dir: Path to the git repo of the project.
+    :type project_dir: str
+    :param bugtracker_url: Url to the bug tracker for the issues.
+    :type bugtracker_url: str
+    :param rpm_format: if set to True, will make the changelog rpm-compatible
+    :returns: changelog
+    :rtype: str
+    :rises RuntimeError: If the changelog could not be retrieved
     """
     changelog = ''
     pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
@@ -147,6 +144,37 @@ def get_changelog(project_dir=os.curdir, bugtracker_url='', rpm_format=False):
         )
 
     return changelog
+
+
+def get_releasenotes(project_dir=os.curdir, bugtracker_url=''):
+    """
+    Retrieves the release notes, from the RELEASE_NOTES file (if in a package)
+    or generates it from the git history.
+
+    Args:
+        project_dir(str): Path to the git repo of the project.
+        bugtracker_url(str): Url to the bug tracker for the issues.
+
+    Returns:
+        str: release notes
+
+    Raises:
+        RuntimeError: If the release notes could not be retrieved
+    """
+    releasenotes = ''
+    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    releasenotes_file = os.path.join(project_dir, 'RELEASE_NOTES')
+    if os.path.exists(pkg_info_file) and os.path.exists(releasenotes_file):
+        with open(releasenotes_file) as releasenotes_fd:
+            releasenotes = releasenotes_fd.read()
+
+    else:
+        releasenotes = api.get_releasenotes(
+            repo_path=project_dir,
+            bugtracker_url=bugtracker_url,
+        )
+
+    return releasenotes
 
 
 def create_authors(project_dir=os.curdir):
@@ -167,7 +195,7 @@ def create_authors(project_dir=os.curdir):
     authors = get_authors(project_dir=project_dir)
     with open(authors_file, 'wb') as authors_fd:
         authors_fd.write(
-            b'\n'.join(a.encode('utf-8') for a in authors)
+            b'\n'.join(a.encode('utf-8') for a in authors) + b'\n'
         )
 
 
@@ -176,17 +204,13 @@ def create_changelog(project_dir=os.curdir, bugtracker_url='',
     """
     Creates the changelog file, if not in a package.
 
-    Args:
-        project_dir(str): Path to the git repo of the project.
-        bugtracker_url(str): Url to the bug tracker for the issues.
-        rpm_format(bool): if set to True, will make the changelog
-            rpm-compatible
-
-    Returns:
-        None
-
-    Raises:
-        RuntimeError: If the changelog could not be retrieved
+    :param project_dir: Path to the git repo of the project.
+    :type project_dir: str
+    :param bugtracker_url: Url to the bug tracker for the issues.
+    :type bugtracker_url: str
+    :param rpm_format: if set to True, will make the changelog rpm-compatible.
+    :type rpm_format: bool
+    :rises RuntimeError: If the changelog could not be retrieved
     """
     pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
     if os.path.exists(pkg_info_file):
@@ -199,4 +223,31 @@ def create_changelog(project_dir=os.curdir, bugtracker_url='',
                 bugtracker_url=bugtracker_url,
                 rpm_format=rpm_format,
             ).encode('utf-8')
+        )
+
+
+def create_releasenotes(project_dir=os.curdir, bugtracker_url=''):
+    """
+    Creates the release notes file, if not in a package.
+
+    Args:
+        project_dir(str): Path to the git repo of the project.
+        bugtracker_url(str): Url to the bug tracker for the issues.
+
+    Returns:
+        None
+
+    Raises:
+        RuntimeError: If the release notes could not be retrieved
+    """
+    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    if os.path.exists(pkg_info_file):
+        return
+
+    with open('RELEASE_NOTES', 'wb') as releasenotes_fd:
+        releasenotes_fd.write(
+            get_releasenotes(
+                project_dir=project_dir,
+                bugtracker_url=bugtracker_url,
+            ).encode('utf-8') + b'\n'
         )

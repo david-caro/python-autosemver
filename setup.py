@@ -52,12 +52,15 @@ else:
 
 
 if __name__ == '__main__':
+    URL = 'https://github.com/david-caro/python-autosemver'
     if not IN_A_PACKAGE:
         with open('AUTHORS', 'w') as authors_fd:
             authors_fd.write('\n'.join(get_authors()))
 
         with open('CHANGELOG', 'w') as changelog_fd:
-            changelog_fd.write(get_changelog())
+            changelog_fd.write(get_changelog(
+                bugtracker_url=URL + '/issues/'
+            ))
 
     setup(
         author='David Caro',
@@ -68,7 +71,7 @@ if __name__ == '__main__':
         name='autosemver',
         package_data={'': ['CHANGELOG', 'AUTHORS']},
         packages=['autosemver'],
-        url='https://github.com/david-caro/python-autosemver',
+        url=URL,
         version=__version__,
         entry_points={
             'console_scripts': 'autosemver=autosemver:main',

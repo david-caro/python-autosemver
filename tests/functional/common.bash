@@ -1,11 +1,10 @@
-#!/bin/bats
-
+#!/bin/bash -e
 
 FIXTURES="$BATS_TEST_DIRNAME/fixtures"
 GIT="env HOME=$BATS_TEST_DIRNAME git"
 
 
-add_bug_commits() {
+common.add_bug_commits() {
     echo "something" >> newfile
     $GIT add newfile
     $GIT commit -a -m 'Mèssage with ûtf-8 ßtuff'
@@ -29,7 +28,7 @@ Sôme description (closes #42)
 }
 
 
-add_feature_commits() {
+common.add_feature_commits() {
     echo "something" >> newfile
     $GIT add newfile
     $GIT commit -a \
@@ -48,7 +47,7 @@ Sem-Ver: feature
 }
 
 
-add_api_breaking_commits() {
+common.add_api_breaking_commits() {
     echo "something" >> newfile
     $GIT add newfile
     $GIT commit -a \
@@ -67,35 +66,35 @@ Sem-Ver: api breaking
 }
 
 
-set_git_config() {
+common.set_git_config() {
     local author="${1:-Wöndérfûl nàmé}"
     $GIT config --add user.name "$author"
     $GIT config --add user.email "wöndérfûl@éma.il"
 }
 
 
-create_dummy_git_repo() {
+common.create_dummy_git_repo() {
     local basedir="${1?}"
     rm -rf "$basedir"
     mkdir -p "$basedir"
     pushd "$basedir"
     $GIT init .
-    set_git_config
-    add_bug_commits
-    set_git_config "author2"
-    add_feature_commits
-    set_git_config
-    add_api_breaking_commits
-    add_feature_commits
-    add_api_breaking_commits
-    add_bug_commits
-    add_api_breaking_commits
-    add_feature_commits
-    add_bug_commits
+    common.set_git_config
+    common.add_bug_commits
+    common.set_git_config "author2"
+    common.add_feature_commits
+    common.set_git_config
+    common.add_api_breaking_commits
+    common.add_feature_commits
+    common.add_api_breaking_commits
+    common.add_bug_commits
+    common.add_api_breaking_commits
+    common.add_feature_commits
+    common.add_bug_commits
 }
 
 
-create_setup.py() {
+common.create_setup.py() {
     cat >> setup.py <<EOS
 #encoding: utf-8
 import setuptools
@@ -113,14 +112,18 @@ setuptools.setup(
         package_data={'': ['CHANGELOG', 'AUTHORS']},
         packages=['dummytest'],
         url=URL,
-        bugtracker_url=URL + '/issues/',
-        autosemver=True,
+        autosemver={
+            'bugtracker_url': URL + '/issues/',
+            'with_release_notes': True,
+            'with_authors': True,
+            'with_changelog': True,
+        },
 )
 EOS
 }
 
 
-create_main_module() {
+common.create_main_module() {
     mkdir dummytest
     cat >> dummytest/__init__.py <<EOI
 from .version import __version__
@@ -139,99 +142,35 @@ EOS
 }
 
 
-create_python_package(){
-    create_setup.py
-    create_main_module
+common.create_python_package(){
+    common.create_setup.py
+    common.create_main_module
 }
 
 
-mask_commit_hashes() {
+common.mask_commit_hashes() {
     local fpath="${1?}"
     sed -i -e 's/\(^ *\(MAJOR\|MINOR\|FEATURE\) \).\{8\}: /\1 11111111: /g' \
         "$fpath"
 }
 
 
-mask_dates() {
+common.mask_dates() {
     local fpath="${1?}"
     sed -i -e 's/^\* ... ... .. .... /* --fake_date_placeholder-- /' "$fpath"
 }
 
 
-cleanup_changelog() {
+common.cleanup_changelog() {
     local changelog="${1?}"
     cp "$changelog" "$changelog.clean"
-    mask_commit_hashes "$changelog.clean"
-    mask_dates "$changelog.clean"
+    common.mask_commit_hashes "$changelog.clean"
+    common.mask_dates "$changelog.clean"
 }
 
 
-cleanup_releasenotes() {
+common.cleanup_releasenotes() {
     releasenotes="${1?}"
     cp "$releasenotes" "$releasenotes.clean"
-    mask_commit_hashes "$releasenotes.clean"
-}
-
-
-@test "basic: preparing" {
-    create_dummy_git_repo "$FIXTURES/repo1"
-    create_python_package
-}
-
-
-@test "basic: sdist" {
-    pushd "$FIXTURES/repo1"
-    python setup.py sdist
-    tree
-    [[ -f dist/dummytest-6.2.3.tar.gz ]]
-}
-
-
-@test "basic: changelog" {
-    pushd "$FIXTURES/repo1"
-    cleanup_changelog "$FIXTURES/EXPECTED_CHANGELOG"
-    cleanup_changelog CHANGELOG
-    diff "$FIXTURES/EXPECTED_CHANGELOG.clean" CHANGELOG.clean
-}
-
-
-@test "basic: authors" {
-    pushd "$FIXTURES/repo1"
-    diff "$FIXTURES/EXPECTED_AUTHORS" AUTHORS
-}
-
-
-@test "basic: rpm changelog" {
-    pushd "$FIXTURES/repo1"
-    autosemver . changelog --rpm > RPM_CHANGELOG
-    cleanup_changelog "$FIXTURES/EXPECTED_RPM_CHANGELOG"
-    cleanup_changelog RPM_CHANGELOG
-    diff "$FIXTURES/EXPECTED_RPM_CHANGELOG.clean" RPM_CHANGELOG.clean
-}
-
-
-@test "basic: releasenotes" {
-    pushd "$FIXTURES/repo1"
-    autosemver . releasenotes > RELEASENOTES
-    cleanup_releasenotes "$FIXTURES/EXPECTED_RELEASENOTES"
-    cleanup_releasenotes RELEASENOTES
-    diff "$FIXTURES/EXPECTED_RELEASENOTES.clean" RELEASENOTES.clean
-}
-
-
-@test "basic: package version pattern" {
-    pushd "$FIXTURES/repo1"
-    python setup.py sdist
-    pip uninstall -y dummytest || :
-    pip install dist/*tar.gz
-
-    expected_version="6.2.3"
-    version="$(python -c '
-from __future__ import print_function;
-import dummytest
-print(dummytest.__version__)')"
-
-    echo "Checking that '$version'=='$expected_version'"
-   [[ "$version" == "$expected_version" ]]
-
+    common.mask_commit_hashes "$releasenotes.clean"
 }

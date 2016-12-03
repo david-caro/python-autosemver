@@ -36,19 +36,26 @@ and add `autosemver` to the `setup_requires` and `install_requires` entries::
        ...
        setup_requires=['autosemver'],
        ...
-       autosemver=True
+       autosemver=True,
    )
 
 
-There is an optional key to specify the url of your bug tracker, currently only
-github and bugzilla bug specifications are supported, the key is
-`bugtracker_url` and you can use it like::
+You can change the default behavior for autosemver, for example, you can define
+a bugtracker url to add a link on all the bugs specified in the commit messages
+and point them out on the changelog. To pass parameters to autosemver, you can
+use a dictionary as the value to the autosemver::
 
    setup(
-       ...
-       bugtracker_url='https://github.com/david-caro/python-autosemver/issues/'
-       ...
+        ...
+        autosemver={
+           'bugtracker_url'='https://github.com/david-caro/python-autosemver/issues/'
+        },
+        ...
    )
+
+To see a full list of parameters you can check the docs for the function
+:mod:`autosemver.distutils_autosemver_case`.
+
 
 If you use a version module pattern
 +++++++++++++++++++++++++++++++++++

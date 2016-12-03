@@ -26,6 +26,7 @@
 
 import copy
 import sys
+import warnings
 
 import argparse
 
@@ -40,6 +41,7 @@ from .packaging import (
     get_current_version as pkg_version,
     create_authors,
     create_changelog,
+    create_releasenotes,
 )
 
 PROJECT_NAME = 'python-autosemver'
@@ -65,7 +67,9 @@ def main(args=None):
         action='store_true',
         help='If set, the changelog will be rpm friendly.'
     )
-    changelog_parser.set_defaults(func=get_changelog)
+    changelog_parser.set_defaults(
+        func=lambda *args, **kwargs: get_changelog(*args, **kwargs).strip()
+    )
     version_parser = subparsers.add_parser('version')
     version_parser.set_defaults(func=get_current_version)
     releasenotes_parser = subparsers.add_parser('releasenotes')
@@ -92,20 +96,81 @@ def main(args=None):
     print(_to_str(args.func(**params)))
 
 
+def distutils_default_case(metadata, attr, value):
+    if value:
+        setattr(metadata, attr, value)
+
+    return metadata
+
+
+def distutils_autosemver_case(
+    metadata, with_release_notes=False, with_authors=True, with_changelog=True,
+    bugtracker_url=None,
+):
+    """
+    :param metadata: distutils metadata object.
+    :param with_release_notes: if true, will create the release notes.
+    :type with_release_notes: bool
+    :param with_authors: if true, will create the authors file.
+    :type with_authors: bool
+    :param with_changelog: if true, will create the release notes file.
+    :type with_changelog: bool
+    :param bugtracker_url: URL for the bugtracker of the project.
+    :type bugtracker_url: str
+    :returns metadata: the updated distutils metadata.
+    """
+    metadata.version = pkg_version()
+    if with_authors:
+        create_authors()
+
+    if with_release_notes:
+        create_releasenotes()
+
+    if with_changelog:
+        create_changelog()
+
+    metadata._autosmever = True
+
+    return metadata
+
+
+def distutils_old_autosemver_case(metadata, attr, value):
+    """DEPRECATED"""
+    metadata = distutils_default_case(metadata, attr, value)
+    create_changelog(bugtracker_url=getattr(metadata, 'bugtracker_url', ''))
+    return metadata
+
+
 def distutils(dist, attr, value):
     if attr != 'autosemver':
-        if value:
-            setattr(dist.metadata, attr, value)
-            if getattr(dist.metadata, '_autosmever', ''):
-                create_changelog(bugtracker_url=value)
+        dist.metadata = distutils_default_case(
+            metadata=dist.metadata,
+            attr=attr,
+            value=value,
+        )
+    if attr == 'bugtracker_url':
+        warnings.warn(
+            'Using explicit parametes is deprecated and will be removed, '
+            'pass a dictionary as the value of the autosemver parameter '
+            'instead.'
+        )
 
-        return
+        if getattr(dist.metadata, '_autosmever', False):
+            dist.metadata = distutils_old_autosemver_case(
+                metadata=dist.metadata,
+                attr=attr,
+                value=value,
+            )
 
-    dist.metadata.version = pkg_version()
-    create_authors()
+    else:
+        if not isinstance(value, dict):
+            value = {
+                'bugtracker_url': getattr(dist.metadata, 'bugtracker_url', ''),
+            }
 
-    create_changelog(
-        bugtracker_url=getattr(dist.metadata, 'bugtracker_url', ''),
-    )
+        dist.metadata = distutils_autosemver_case(
+            metadata=dist.metadata,
+            **value
+        )
 
-    dist.metadata._autosmever = True
+    return

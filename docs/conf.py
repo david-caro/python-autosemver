@@ -22,14 +22,27 @@ from __future__ import print_function
 
 import os
 
-from autosemver.packaging import get_changelog, get_current_version
+from autosemver.packaging import (
+    get_changelog, get_current_version, get_releasenotes
+)
 
 
 if not os.path.exists('_build/html/_static'):
     os.makedirs('_build/html/_static')
 
+URL = 'https://github.com/david-caro/python-autosemver'
+BUGTRACKER_URL = URL + '/issues/'
+
+with open('_build/html/_static/RELEASE_NOTES.txt', 'w') as changelog_fd:
+    changelog_fd.write(get_releasenotes(
+        project_dir='..',
+        bugtracker_url=BUGTRACKER_URL,
+    ))
 with open('_build/html/_static/CHANGELOG.txt', 'w') as changelog_fd:
-    changelog_fd.write(get_changelog(project_dir='..'))
+    changelog_fd.write(get_changelog(
+        project_dir='..',
+        bugtracker_url=BUGTRACKER_URL,
+    ))
 
 # -- General configuration ------------------------------------------------
 
@@ -137,7 +150,7 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'autosemver@GitHub': 'https://github.com/david-caro/python-autosemver',
+        'autosemver@GitHub': URL,
         'autosemver@PyPI': 'https://pypi.python.org/pypi/autosemver/',
     }
 }

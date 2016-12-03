@@ -42,6 +42,7 @@ this part of the documentation is for you.
 .. toctree::
    :maxdepth: 2
 
+   autosemver
    api
    git
    packaging
@@ -59,9 +60,15 @@ interested.
    license
 
 
+Release notes
+---------------
+Here you can find the `release notes`_.
+
+
 Changelog
 ------------
-Here you can find the `full changelog for this version`_
+Here you can find the `full changelog for this version`_.
 
 
+.. _release notes: _static/RELEASE_NOTES.txt
 .. _full changelog for this version: _static/CHANGELOG.txt
