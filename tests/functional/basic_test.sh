@@ -122,12 +122,17 @@ EOS
 
 create_main_module() {
     mkdir dummytest
-    touch dummytest/__init__.py
+    cat >> dummytest/__init__.py <<EOI
+from .version import __version__
+
+__all__ = ('__version__')
+EOI
+
     cat >> dummytest/version.py <<EOS
 import autosemver
 
 __version__ = autosemver.packaging.get_current_version(
-    package_name='dummytest'
+    project_name='dummytest'
 )
 
 EOS
@@ -211,4 +216,22 @@ cleanup_releasenotes() {
     cleanup_releasenotes "$FIXTURES/EXPECTED_RELEASENOTES"
     cleanup_releasenotes RELEASENOTES
     diff "$FIXTURES/EXPECTED_RELEASENOTES.clean" RELEASENOTES.clean
+}
+
+
+@test "basic: package version pattern" {
+    pushd "$FIXTURES/repo1"
+    python setup.py sdist
+    pip uninstall -y dummytest || :
+    pip install dist/*tar.gz
+
+    expected_version="6.2.3"
+    version="$(python -c '
+from __future__ import print_function;
+import dummytest
+print(dummytest.__version__)')"
+
+    echo "Checking that '$version'=='$expected_version'"
+   [[ "$version" == "$expected_version" ]]
+
 }
