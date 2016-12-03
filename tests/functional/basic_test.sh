@@ -2,16 +2,17 @@
 
 
 FIXTURES="$BATS_TEST_DIRNAME/fixtures"
+GIT="env HOME=$BATS_TEST_DIRNAME git"
 
 
 add_bug_commits() {
     echo "something" >> newfile
-    git add newfile
-    git commit -a -m 'Mèssage with ûtf-8 ßtuff'
+    $GIT add newfile
+    $GIT commit -a -m 'Mèssage with ûtf-8 ßtuff'
 
     echo "something" >> newfile
-    git add newfile
-    git commit -a \
+    $GIT add newfile
+    $GIT commit -a \
         -m "Mèssage with ûtf-8 ßtuff
 
 Sôme description
@@ -19,8 +20,8 @@ Sem-Ver: bugfix
 "
 
     echo "something" >> newfile
-    git add newfile
-    git commit -a \
+    $GIT add newfile
+    $GIT commit -a \
         -m "Mèssage with ûtf-8 ßtuff
 
 Sôme description (closes #42)
@@ -30,16 +31,16 @@ Sôme description (closes #42)
 
 add_feature_commits() {
     echo "something" >> newfile
-    git add newfile
-    git commit -a \
+    $GIT add newfile
+    $GIT commit -a \
         -m "Mèssage with ûtf-8 ßtuff
 
 Sôme desc
 Sem-Ver: feature
 "
     echo "something" >> newfile
-    git add newfile
-    git commit -a \
+    $GIT add newfile
+    $GIT commit -a \
         -m "Mèssage with ûtf-8 ßtuff
 
 * NEW Sôme description
@@ -49,16 +50,16 @@ Sem-Ver: feature
 
 add_api_breaking_commits() {
     echo "something" >> newfile
-    git add newfile
-    git commit -a \
+    $GIT add newfile
+    $GIT commit -a \
         -m "Mèssage with ûtf-8 ßtuff
 
 Sôme desc
 Sem-Ver: api breaking
 "
     echo "something" >> newfile
-    git add newfile
-    git commit -a \
+    $GIT add newfile
+    $GIT commit -a \
         -m "Mèssage with ûtf-8 ßtuff
 
 * INCOMPATIBLE Sôme description
@@ -68,8 +69,8 @@ Sem-Ver: api breaking
 
 set_git_config() {
     local author="${1:-Wöndérfûl nàmé}"
-    git config --add user.name "$author"
-    git config --add user.email "wöndérfûl@éma.il"
+    $GIT config --add user.name "$author"
+    $GIT config --add user.email "wöndérfûl@éma.il"
 }
 
 
@@ -78,13 +79,19 @@ create_dummy_git_repo() {
     rm -rf "$basedir"
     mkdir -p "$basedir"
     pushd "$basedir"
-    git init .
+    $GIT init .
     set_git_config
     add_bug_commits
     set_git_config "author2"
     add_feature_commits
     set_git_config
     add_api_breaking_commits
+    add_feature_commits
+    add_api_breaking_commits
+    add_bug_commits
+    add_api_breaking_commits
+    add_feature_commits
+    add_bug_commits
 }
 
 
@@ -135,9 +142,29 @@ create_python_package(){
 
 mask_commit_hashes() {
     local fpath="${1?}"
-    sed -e 's/\(^ *\(MAJOR\|MINOR\|FEATURE\) \).\{8\}: /\1 11111111: /g' \
-        "$fpath" \
-    > "$fpath.clean"
+    sed -i -e 's/\(^ *\(MAJOR\|MINOR\|FEATURE\) \).\{8\}: /\1 11111111: /g' \
+        "$fpath"
+}
+
+
+mask_dates() {
+    local fpath="${1?}"
+    sed -i -e 's/^\* ... ... .. .... /* --fake_date_placeholder-- /' "$fpath"
+}
+
+
+cleanup_changelog() {
+    local changelog="${1?}"
+    cp "$changelog" "$changelog.clean"
+    mask_commit_hashes "$changelog.clean"
+    mask_dates "$changelog.clean"
+}
+
+
+cleanup_releasenotes() {
+    releasenotes="${1?}"
+    cp "$releasenotes" "$releasenotes.clean"
+    mask_commit_hashes "$releasenotes.clean"
 }
 
 
@@ -151,14 +178,14 @@ mask_commit_hashes() {
     pushd "$FIXTURES/repo1"
     python setup.py sdist
     tree
-    [[ -f dist/dummytest-2.0.0.tar.gz ]]
+    [[ -f dist/dummytest-6.2.3.tar.gz ]]
 }
 
 
 @test "basic: changelog" {
     pushd "$FIXTURES/repo1"
-    mask_commit_hashes "$FIXTURES/EXPECTED_CHANGELOG"
-    mask_commit_hashes CHANGELOG
+    cleanup_changelog "$FIXTURES/EXPECTED_CHANGELOG"
+    cleanup_changelog CHANGELOG
     diff "$FIXTURES/EXPECTED_CHANGELOG.clean" CHANGELOG.clean
 }
 
@@ -171,17 +198,17 @@ mask_commit_hashes() {
 
 @test "basic: rpm changelog" {
     pushd "$FIXTURES/repo1"
-    mask_commit_hashes "$FIXTURES/EXPECTED_RPM_CHANGELOG"
     autosemver . changelog --rpm > RPM_CHANGELOG
-    mask_commit_hashes RPM_CHANGELOG
+    cleanup_changelog "$FIXTURES/EXPECTED_RPM_CHANGELOG"
+    cleanup_changelog RPM_CHANGELOG
     diff "$FIXTURES/EXPECTED_RPM_CHANGELOG.clean" RPM_CHANGELOG.clean
 }
 
 
 @test "basic: releasenotes" {
     pushd "$FIXTURES/repo1"
-    mask_commit_hashes "$FIXTURES/EXPECTED_RELEASENOTES"
     autosemver . releasenotes > RELEASENOTES
-    mask_commit_hashes RELEASENOTES
+    cleanup_releasenotes "$FIXTURES/EXPECTED_RELEASENOTES"
+    cleanup_releasenotes RELEASENOTES
     diff "$FIXTURES/EXPECTED_RELEASENOTES.clean" RELEASENOTES.clean
 }
