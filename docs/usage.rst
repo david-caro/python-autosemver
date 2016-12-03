@@ -50,6 +50,22 @@ github and bugzilla bug specifications are supported, the key is
        ...
    )
 
+If you use a version module pattern
++++++++++++++++++++++++++++++++++++
+It's common on some python packages to have a '__version__' property at the
+root of the module to indicate the package version, in that case, you can use
+the following call::
+
+    import autosemver
+
+    __version__ = autosemver.packaging.get_current_version(
+        project_name='myprojectname'
+    )
+
+The parameter 'project_name' is required to avoid import loops and to allow
+correct version detection.
+
+
 Declaring the type of change a commit introduces
 ------------------------------------------------
 
