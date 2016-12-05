@@ -93,3 +93,8 @@ CHANGELOG
 
 # vim temp files
 *.sw?
+
+# secondary test-generated artifacts
+*.clean
+tests/functional/fixtures/repo*
+tests/functional/.gitconfig
