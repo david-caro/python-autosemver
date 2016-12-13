@@ -44,6 +44,7 @@ load common
     python setup.py sdist
     pip uninstall -y dummytest || :
     pip install dist/*tar.gz
+    cd /tmp
 
     expected_version="6.2.3"
     version="$(python -c '

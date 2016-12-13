@@ -76,9 +76,9 @@ def get_current_version(project_name=None, project_dir=os.curdir,
     if version is None:
         if project_name:
             try:
-                version = (
-                    pkg_resources.get_distribution(project_name).split(' ')[0]
-                )
+                distribution = pkg_resources.get_distribution(project_name)
+                if distribution.has_version():
+                    version = distribution.version
             except:
                 pass
 
