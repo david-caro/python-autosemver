@@ -31,7 +31,9 @@ Sôme description (closes #42)
 common.add_feature_commits() {
     echo "something" >> newfile
     $GIT add newfile
+    # Dummy old date to make sure the commit order is hierarchycal
     $GIT commit -a \
+        --date="Wed Feb 16 14:00 2011 +0100" \
         -m "Mèssage with ûtf-8 ßtuff
 
 Sôme desc
