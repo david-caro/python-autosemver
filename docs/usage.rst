@@ -25,7 +25,7 @@ Changes needed to the code
 --------------------------
 
 To use the automatic semantic versioning scheme, you just have to add some
-extra keywords to your `setup.py` file, in the call to the `distutils.setup`,
+extra keywords to your `setup.py` file, in the call to the `setuptools.setup`,
 and add `autosemver` to the `setup_requires` and `install_requires` entries::
 
    setup(
@@ -38,6 +38,10 @@ and add `autosemver` to the `setup_requires` and `install_requires` entries::
        ...
        autosemver=True,
    )
+
+
+**NOTE**: using the old `distutils` module directly might not work due to the
+plugin loading, you should try to use the newer (and recomended) `setuptools`.
 
 
 You can change the default behavior for autosemver, for example, you can define
