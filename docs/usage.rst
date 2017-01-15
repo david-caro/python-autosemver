@@ -52,7 +52,7 @@ use a dictionary as the value to the autosemver::
    setup(
         ...
         autosemver={
-           'bugtracker_url'='https://github.com/david-caro/python-autosemver/issues/'
+           'bugtracker_url': 'https://github.com/david-caro/python-autosemver/issues/'
         },
         ...
    )
