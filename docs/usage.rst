@@ -25,7 +25,7 @@ Changes needed to the code
 --------------------------
 
 To use the automatic semantic versioning scheme, you just have to add some
-extra keywords to your `setup.py` file, in the call to the `distutils.setup`,
+extra keywords to your `setup.py` file, in the call to the `setuptools.setup`,
 and add `autosemver` to the `setup_requires` and `install_requires` entries::
 
    setup(
@@ -40,6 +40,10 @@ and add `autosemver` to the `setup_requires` and `install_requires` entries::
    )
 
 
+**NOTE**: using the old `distutils` module directly might not work due to the
+plugin loading, you should try to use the newer (and recomended) `setuptools`.
+
+
 You can change the default behavior for autosemver, for example, you can define
 a bugtracker url to add a link on all the bugs specified in the commit messages
 and point them out on the changelog. To pass parameters to autosemver, you can
@@ -48,7 +52,7 @@ use a dictionary as the value to the autosemver::
    setup(
         ...
         autosemver={
-           'bugtracker_url'='https://github.com/david-caro/python-autosemver/issues/'
+           'bugtracker_url': 'https://github.com/david-caro/python-autosemver/issues/'
         },
         ...
    )
