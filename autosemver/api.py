@@ -84,9 +84,9 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url='',
     Args:
         repo_path (str): path to the git repo
         from_commit (str): refspec (partial commit hash, tag, branch, full
-        refspec, partial refspec) to start the changelog from
+            refspec, partial refspec) to start the changelog from
         rpm_format(bool): if set, the changelog will be suitable to be uses as
-        rpm package changelog.
+            rpm package changelog.
 
     Returns:
         str: Rpm compatible changelog
@@ -172,6 +172,12 @@ def get_current_version(repo_path):
         sem-ver: feature
 
     And counting any other as a bugfix
+
+    Args:
+        repo_path(str): path to the git repository to get the version for.
+
+    Returns:
+        str: Version string for that repository.
     """
     repo = dulwich.repo.Repo(repo_path)
     tags = get_tags(repo)
@@ -200,6 +206,14 @@ def get_authors(repo_path, from_commit=None):
     """
     Given a repo and optionally a base revision to start from, will return
     the list of authors.
+
+    Args:
+        repo_path(str): Path to the code git repository.
+        from_commit(str): Refspec of the commit to start aggregating the
+            authors from.
+
+    Returns:
+        list: lexicographically sorted list of authors of the repo.
     """
     repo = dulwich.repo.Repo(repo_path)
     refs = get_refs(repo)
@@ -232,6 +246,16 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
     Given a repo and optionally a base revision to start from, will return
     a text suitable for the relase notes announcement, grouping the bugs, the
     features and the api-breaking changes.
+
+    Args:
+        repo_path(str): Path to the code git repository.
+        from_commit(str): Refspec of the commit to start aggregating the
+            authors from.
+        bugtracker_url(str): URL to be prepended to any bug ids found in the
+            commits.
+
+    Returns:
+        str: Release notes text.
     """
     repo = dulwich.repo.Repo(repo_path)
     tags = get_tags(repo)
