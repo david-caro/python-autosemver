@@ -95,6 +95,35 @@ common.create_dummy_git_repo() {
     common.add_bug_commits
 }
 
+common.create_dummy_git_repo_with_tags() {
+    local basedir="${1?}"
+    rm -rf "$basedir"
+    mkdir -p "$basedir"
+    pushd "$basedir"
+    $GIT init .
+    common.set_git_config
+    common.add_bug_commits
+    git tag '1.2.3'
+    common.set_git_config "author2"
+    common.add_feature_commits
+    git tag 'v2.2.3'
+    common.set_git_config
+    common.add_api_breaking_commits
+    git tag 'v2343.3'
+    common.add_feature_commits
+    common.add_api_breaking_commits
+    git tag 'v3'
+    common.add_bug_commits
+    common.add_api_breaking_commits
+    git tag '3'
+    common.add_feature_commits
+    common.add_bug_commits
+    git tag '4.3123.1'
+    common.add_feature_commits
+    common.add_bug_commits
+    git tag '5.6.7.8'
+}
+
 
 common.create_setup.py() {
     cat >> setup.py <<EOS

@@ -44,7 +44,7 @@ import dulwich.walk
 BUG_URL_REG = re.compile(
     r'.*(closes #|fixes #|adresses #)(?P<bugid>\d+)'
 )
-VALID_TAG = re.compile(r'^\d+\.\d+$')
+VALID_TAG = re.compile(r'^v?\d+\.\d+(\.\d+)?$')
 FEAT_HEADER = re.compile(
     r'\nsem-ver:\s*.*(feature|deprecat).*\n',
     flags=re.IGNORECASE,
@@ -72,6 +72,27 @@ def _to_str(maybe_str):
             pass
 
     return maybe_str
+
+
+def _tag2tuple(tag):
+    feat_version = 0
+    fix_version = 0
+    version = tag.split('.')
+    if len(version) == 1:
+        maj_version = version[0]
+    if len(version) == 2:
+        maj_version, feat_version = version
+    if len(version) == 3:
+        maj_version, feat_version, fix_version = version
+
+    if maj_version.startswith('v'):
+        maj_version = maj_version[1:]
+
+    maj_version = int(maj_version)
+    feat_version = int(feat_version)
+    fix_version = int(fix_version)
+
+    return maj_version, feat_version, fix_version
 
 
 def get_repo_object(repo, object_name):
@@ -322,10 +343,7 @@ def get_version(commit, tags, maj_version=0, feat_version=0, fix_version=0,
     commit_sha = commit.sha().hexdigest()
 
     if commit_sha in tags:
-        maj_version, feat_version = tags[commit_sha].split('.')
-        maj_version = int(maj_version)
-        feat_version = int(feat_version)
-        fix_version = 0
+        maj_version, feat_version, fix_version = _tag2tuple(tags[commit_sha])
     elif commit_type == 'api_break':
         maj_version += 1
         feat_version = 0
@@ -361,9 +379,7 @@ def get_commit_type(commit, children=None, tags=None, prev_version=None):
     commit_sha = commit.sha().hexdigest()
 
     if commit_sha in tags:
-        maj_version, feat_version = tags[commit_sha].split('.')
-        maj_version = int(maj_version)
-        feat_version = int(feat_version)
+        maj_version, feat_version, _ = _tag2tuple(tags[commit_sha])
         if maj_version > prev_version[0]:
             return 'api_break'
         elif feat_version > prev_version[1]:
