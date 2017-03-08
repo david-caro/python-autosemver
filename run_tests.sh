@@ -19,6 +19,9 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307, USA.
 
+result=0
+
+echo '########## Running unit tests'
 pytest \
     --pep8 \
     --cov=autosemver \
@@ -26,7 +29,16 @@ pytest \
     -vv \
     "$@" \
     tests/unit \
-    autosemver && \
-sphinx-build -qnN docs docs/_build/html && \
-bats tests/functional/*test.sh
+    autosemver \
+|| exit $?
+
+echo
+echo '########## Building docs'
+sphinx-build -qnN docs docs/_build/html \
+|| exit $?
+
+echo
+echo '########## Running functional tests'
+bats tests/functional/*test.sh \
+|| exit $?
 

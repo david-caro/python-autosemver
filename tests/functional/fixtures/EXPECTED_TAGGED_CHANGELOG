@@ -1,65 +1,81 @@
-* 6.2.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 43b8e854: Mèssage with ûtf-8 ßtuff
+* 4.3125.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR 36973b73: Mèssage with ûtf-8 ßtuff
     FIXED ISSUES: 42
 
-* 6.2.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 28f5ece1: Mèssage with ûtf-8 ßtuff
+* 4.3125.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR 8d965f4e: Mèssage with ûtf-8 ßtuff
 
-* 6.2.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR d4316aec: Mèssage with ûtf-8 ßtuff
+* 4.3125.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR dda663f9: Mèssage with ûtf-8 ßtuff
 
-* 6.2.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    FEATURE 3749523e: Mèssage with ûtf-8 ßtuff
+* 4.3125.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE 8446709b: Mèssage with ûtf-8 ßtuff
 
-* 6.1.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    FEATURE 0a72639a: Mèssage with ûtf-8 ßtuff
+* 4.3124.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE df120cae: Mèssage with ûtf-8 ßtuff
 
-* 6.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MAJOR 49abbd5a: Mèssage with ûtf-8 ßtuff
-
-* 5.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MAJOR 8da2d9ed: Mèssage with ûtf-8 ßtuff
-
-* 4.0.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR b587d21c: Mèssage with ûtf-8 ßtuff
+* 4.3123.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE 62209b90: Mèssage with ûtf-8 ßtuff
     FIXED ISSUES: 42
 
-* 4.0.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 0353fb22: Mèssage with ûtf-8 ßtuff
+* 2347.2.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR f23861b9: Mèssage with ûtf-8 ßtuff
 
-* 4.0.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR c9f8714e: Mèssage with ûtf-8 ßtuff
+* 2347.2.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR b001ec94: Mèssage with ûtf-8 ßtuff
 
-* 4.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MAJOR d59cffe4: Mèssage with ûtf-8 ßtuff
+* 2347.2.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE 0e7394f1: Mèssage with ûtf-8 ßtuff
+
+* 2347.1.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE f22156e9: Mèssage with ûtf-8 ßtuff
+
+* 2347.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR 7b26ba3e: Mèssage with ûtf-8 ßtuff
+
+* 2346.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR b2cb6f48: Mèssage with ûtf-8 ßtuff
+
+* 2345.0.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR 90750dc5: Mèssage with ûtf-8 ßtuff
+    FIXED ISSUES: 42
+
+* 2345.0.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR d34b6f79: Mèssage with ûtf-8 ßtuff
+
+* 2345.0.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MINOR a41b1be8: Mèssage with ûtf-8 ßtuff
+
+* 2345.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR a61d7467: Mèssage with ûtf-8 ßtuff
+
+* 2344.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR 7fb6f8a2: Mèssage with ûtf-8 ßtuff
+
+* 2343.5.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE e2c23464: Mèssage with ûtf-8 ßtuff
+
+* 2343.4.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    FEATURE b0abd608: Mèssage with ûtf-8 ßtuff
+
+* 2343.3.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR 20a3525e: Mèssage with ûtf-8 ßtuff
 
 * 3.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MAJOR a0d17729: Mèssage with ûtf-8 ßtuff
+    MAJOR 844f9cf0: Mèssage with ûtf-8 ßtuff
 
-* 2.2.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    FEATURE 8d5e718e: Mèssage with ûtf-8 ßtuff
+* 2.2.3 "author2 <wöndérfûl@éma.il>"
+    MAJOR b8d85812: Mèssage with ûtf-8 ßtuff
 
-* 2.1.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    FEATURE 91510a53: Mèssage with ûtf-8 ßtuff
+* 1.3.0 "author2 <wöndérfûl@éma.il>"
+    FEATURE 3f6214da: Mèssage with ûtf-8 ßtuff
 
-* 2.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MAJOR fe7b543b: Mèssage with ûtf-8 ßtuff
-
-* 1.0.0 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MAJOR d49c576a: Mèssage with ûtf-8 ßtuff
-
-* 0.2.0 "author2 <wöndérfûl@éma.il>"
-    FEATURE 46455da1: Mèssage with ûtf-8 ßtuff
-
-* 0.1.0 "author2 <wöndérfûl@éma.il>"
-    FEATURE 225594c5: Mèssage with ûtf-8 ßtuff
-
-* 0.0.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 6b23fbe6: Mèssage with ûtf-8 ßtuff
+* 1.2.3 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
+    MAJOR cb1a89c0: Mèssage with ûtf-8 ßtuff
     FIXED ISSUES: 42
 
 * 0.0.2 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR 559d4567: Mèssage with ûtf-8 ßtuff
+    MINOR e15f9adb: Mèssage with ûtf-8 ßtuff
 
 * 0.0.1 "Wöndérfûl nàmé <wöndérfûl@éma.il>"
-    MINOR b4642818: Mèssage with ûtf-8 ßtuff
+    MINOR 086819bb: Mèssage with ûtf-8 ßtuff
