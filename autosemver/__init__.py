@@ -35,6 +35,7 @@ from .api import (
     get_changelog,
     get_current_version,
     get_releasenotes,
+    tag_versions,
 )
 from .git import _to_str
 from .packaging import (
@@ -88,6 +89,8 @@ def main(args=None):
     authors_parser.set_defaults(
         func=lambda *args, **kwargs: '\n'.join(get_authors(*args, **kwargs))
     )
+    tag_parser = subparsers.add_parser('tag')
+    tag_parser.set_defaults(func=tag_versions)
     args = parser.parse_args(args)
 
     params = copy.deepcopy(vars(args))

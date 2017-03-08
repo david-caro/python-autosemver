@@ -33,6 +33,8 @@ repository.
 """
 from __future__ import print_function
 
+import sys
+
 from collections import OrderedDict
 from functools import wraps
 
@@ -54,6 +56,9 @@ from .git import (  # noqa
     get_commit_type,
     pretty_commit,
 )
+
+
+ON_PYTHON3 = (sys.version_info >= (3, 0))
 
 
 def _needs_git(func):
@@ -199,6 +204,54 @@ def get_current_version(repo_path):
         )
 
     return '%s.%s.%s' % (maj_version, feat_version, fix_version)
+
+
+@_needs_git
+def tag_versions(repo_path):
+    """
+    Given a repo will add a tag for each major version.
+
+    Args:
+        repo_path(str): path to the git repository to tag.
+    """
+    repo = dulwich.repo.Repo(repo_path)
+    tags = get_tags(repo)
+    maj_version = 0
+    feat_version = 0
+    fix_version = 0
+    last_maj_version = 0
+    last_feat_version = 0
+    result = []
+
+    for commit_sha, children in reversed(
+            get_children_per_first_parent(repo_path).items()
+    ):
+        commit = get_repo_object(repo, commit_sha)
+        maj_version, feat_version, fix_version = get_version(
+            commit=commit,
+            tags=tags,
+            maj_version=maj_version,
+            feat_version=feat_version,
+            fix_version=fix_version,
+            children=children,
+        )
+        if (
+            last_maj_version != maj_version or
+            last_feat_version != feat_version
+        ):
+            last_maj_version = maj_version
+            last_feat_version = feat_version
+            tag_name = 'refs/tags/%d.%d' % (maj_version, feat_version)
+            if ON_PYTHON3:
+                repo[str.encode(tag_name)] = commit
+            else:
+                repo[tag_name] = commit
+
+            result.append(
+                '%d.%d -> %s' % (maj_version, feat_version, commit_sha)
+            )
+
+    return '\n'.join(result)
 
 
 @_needs_git
