@@ -41,3 +41,11 @@ load common
     common.cleanup_releasenotes RELEASE_NOTES
     diff "$FIXTURES/EXPECTED_RELEASE_NOTES.clean" RELEASE_NOTES.clean
 }
+
+
+@test "cli: tag" {
+    pushd "$FIXTURES/repo1"
+    autosemver . tag
+    git tag > TAGS
+    diff "$FIXTURES/EXPECTED_TAGS" TAGS
+}
