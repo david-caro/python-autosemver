@@ -1,11 +1,20 @@
 notifications:
   email: false
+
 sudo: true
+
 language: python
+
 matrix:
   fast_finish: true
+
 cache:
   - pip
+
+branches:
+  only:
+    - master
+
 python:
   - '2.7'
   - '3.5'

@@ -104,31 +104,76 @@ def get_repo_object(repo, object_name):
     return repo.get_object(object_name)
 
 
-def fit_to_cols(what, indent, cols=79):
-    lines = []
-    free_cols = cols - len(indent)
-    has_indent = False
-    while len(what) > free_cols and ' ' in what.lstrip():
-        cutpoint = free_cols
-        extra_indent = ''
-        if what[free_cols] != ' ':
-            try:
-                if has_indent:
-                    prev_space = what[len(has_indent):free_cols].rindex(' ')
-                else:
-                    prev_space = what[:free_cols].rindex(' ')
+def split_line(what, indent='', cols=79):
+    """Split a line on the closest space, or break the last word with '-'.
 
-                lines.append(indent + what[:prev_space])
-                cutpoint = prev_space + 1
-                extra_indent = '          '
-            except ValueError:
-                lines.append(indent + what[:free_cols] + '-')
+    Args:
+        what(str): text to spli one line of.
+        indent(str): will prepend this indent to the split line, taking it into
+        account in the column count.
+        cols(int): maximum length of the split line.
+
+    Returns:
+        tuple(str, str): rest of the text and split line in that order.
+
+    Raises:
+        ValueError: when the indent is greater than the indent, or the cols
+        param is too small
+    """
+    if len(indent) > cols:
+        raise ValueError("The indent can't be longer than cols.")
+
+    if cols < 2:
+        raise ValueError(
+            "The cols can't be smaller than 2 (a char plus a possible '-')"
+        )
+
+    what = indent + what.lstrip()
+
+    if len(what) <= cols:
+        what, new_line = '', what
+    else:
+        try:
+            closest_space = what[:cols].rindex(' ')
+        except ValueError:
+            closest_space = -1
+
+        if closest_space > len(indent):
+            what, new_line = (
+                what[closest_space:],
+                what[:closest_space],
+            )
+        elif what[cols] == ' ':
+            what, new_line = (
+                what[cols:],
+                what[:cols],
+            )
         else:
-            lines.append(indent + what[:free_cols])
-        what = extra_indent + what[cutpoint:]
-        if extra_indent:
-            has_indent = extra_indent
-    lines.append(indent + what)
+            what, new_line = what[cols - 1:], what[:cols - 1] + '-'
+
+    return what.lstrip(), new_line.rstrip()
+
+
+def fit_to_cols(what, indent='', cols=79):
+    """Wrap the given text to the columns, prepending the indent to each line.
+
+    Args:
+        what(str): text to wrap.
+        indent(str): indentation to use.
+        cols(int): colt to wrap to.
+
+    Returns:
+        str: Wrapped text
+    """
+    lines = []
+    while what:
+        what, next_line = split_line(
+            what=what,
+            cols=cols,
+            indent=indent,
+        )
+        lines.append(next_line)
+
     return '\n'.join(lines)
 
 
