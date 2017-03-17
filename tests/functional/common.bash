@@ -53,9 +53,9 @@ common.add_api_breaking_commits() {
     echo "something" >> newfile
     $GIT add newfile
     $GIT commit -a \
-        -m "Mèssage with ûtf-8 ßtuff
+        -m "Mèssage with ûtf-8 ßtuff withaverylonglonglongonglonglonglonglonglonglonglonglonglonglonglonglonglongsubject
 
-Sôme desc
+Sôme desc, with withaverylonglonglongonglonglonglonglonglonglonglonglonglonglonglonglonglongline
 Sem-Ver: api breaking
 "
     echo "something" >> newfile
