@@ -46,7 +46,7 @@ BUG_URL_REG = re.compile(
 )
 VALID_TAG = re.compile(r'^v?\d+\.\d+(\.\d+)?$')
 FEAT_HEADER = re.compile(
-    r'\nsem-ver:\s*.*(feature|deprecat).*\n',
+    r'\nsem-ver:\s*.*(feature|deprecat).*(\n|$)',
     flags=re.IGNORECASE,
 )
 FEAT_MSG = re.compile(r'\n\* NEW')
