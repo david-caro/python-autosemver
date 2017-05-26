@@ -46,11 +46,11 @@ BUG_URL_REG = re.compile(
 )
 VALID_TAG = re.compile(r'^v?\d+\.\d+(\.\d+)?$')
 FEAT_HEADER = re.compile(
-    r'\nsem-ver:\s*.*(feature|deprecat).*\n',
+    r'\nsem-ver:\s*.*(feature|deprecat).*(\n|$)',
     flags=re.IGNORECASE,
 )
 FEAT_MSG = re.compile(r'\n\* NEW')
-MAJOR_HEADER = re.compile(r'\nsem-ver:\s*.*break.*\n', flags=re.IGNORECASE)
+MAJOR_HEADER = re.compile(r'\nsem-ver:\s*.*break.*(\n|$)', flags=re.IGNORECASE)
 MAJOR_MSG = re.compile(r'\n\* INCOMPATIBLE')
 
 
@@ -404,14 +404,14 @@ def get_version(commit, tags, maj_version=0, feat_version=0, fix_version=0,
 
 
 def is_api_break(commit):
-    return (
+    return bool(
         MAJOR_HEADER.search(_to_str(commit.message)) or
         MAJOR_MSG.search(_to_str(commit.message))
     )
 
 
 def is_feature(commit):
-    return (
+    return bool(
         FEAT_HEADER.search(_to_str(commit.message)) or
         FEAT_MSG.search(_to_str(commit.message))
     )
