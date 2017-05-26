@@ -404,7 +404,7 @@ def get_version(commit, tags, maj_version=0, feat_version=0, fix_version=0,
 
 
 def is_api_break(commit):
-    return (
+    return bool(
         MAJOR_HEADER.search(_to_str(commit.message)) or
         MAJOR_MSG.search(_to_str(commit.message))
     )
