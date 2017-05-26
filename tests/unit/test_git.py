@@ -19,6 +19,7 @@
 # MA 02111-1307, USA.
 from __future__ import absolute_import, division, print_function
 
+import mock
 import pytest
 import six
 
@@ -145,3 +146,49 @@ def test_fit_to_cols(cols, expected, indent, text):
     result = git.fit_to_cols(**params)
 
     assert result == expected
+
+
+@parametrize({
+    'sem-ver header with newline is feature': {
+        'commit_msg': 'Subject\n\nsem-ver: feature\n',
+        'expected': True,
+    },
+    'sem-ver header without newline is feature': {
+        'commit_msg': 'Subject\n\nsem-ver: feature',
+        'expected': True,
+    },
+    'random caps sem-ver header is feature': {
+        'commit_msg': 'Subject\n\nsEm-VeR: FeAtUre\n',
+        'expected': True,
+    },
+    'sem-ver header with deprecated is feature': {
+        'commit_msg': 'Subject\n\nsem-ver: deprecated\n',
+        'expected': True,
+    },
+    'random caps sem-ver header with deprecated is feature': {
+        'commit_msg': 'Subject\n\nsem-ver: DePrecated\n',
+        'expected': True,
+    },
+    'message with NEW is feature': {
+        'commit_msg': 'Subject\n\n* NEW: fancy stuff\n',
+        'expected': True,
+    },
+    'message wthout header or NEW is NOT feature': {
+        'commit_msg': 'Subject\n\nSome random feature text.\n',
+        'expected': False,
+    },
+    'empty message is NOT feature': {
+        'commit_msg': '',
+        'expected': False,
+    },
+    'message with sem-ver in subject is NOT feature': {
+        'commit_msg': 'sem-ver: feature\n',
+        'expected': False,
+    },
+})
+def test_is_feature(commit_msg, expected):
+
+    commit = mock.MagicMock()
+    commit.message = commit_msg
+
+    assert git.is_feature(commit) == expected
