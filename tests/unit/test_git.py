@@ -192,3 +192,45 @@ def test_is_feature(commit_msg, expected):
     commit.message = commit_msg
 
     assert git.is_feature(commit) == expected
+
+
+@parametrize({
+    'sem-ver header with newline is major': {
+        'commit_msg': 'Subject\n\nsem-ver: api-breaking\n',
+        'expected': True,
+    },
+    'sem-ver header without newline is major': {
+        'commit_msg': 'Subject\n\nsem-ver: api-breaking',
+        'expected': True,
+    },
+    'sem-ver header with \'break\' is major': {
+        'commit_msg': 'Subject\n\nsem-ver: breaks compatibility',
+        'expected': True,
+    },
+    'random caps sem-ver header is major': {
+        'commit_msg': 'Subject\n\nsEm-VeR: ApI-BrEaKinG\n',
+        'expected': True,
+    },
+    'message with INCOMPATIBLE is major': {
+        'commit_msg': 'Subject\n\n* INCOMPATIBLE: old stuff\n',
+        'expected': True,
+    },
+    'message wthout header or INCOMPATIBLE is NOT major': {
+        'commit_msg': 'Subject\n\nSome random thing text.\n',
+        'expected': False,
+    },
+    'empty message is NOT major': {
+        'commit_msg': '',
+        'expected': False,
+    },
+    'message with sem-ver in subject is NOT major': {
+        'commit_msg': 'sem-ver: breaking change\n',
+        'expected': False,
+    },
+})
+def test_is_api_break(commit_msg, expected):
+
+    commit = mock.MagicMock()
+    commit.message = commit_msg
+
+    assert git.is_api_break(commit) == expected
