@@ -50,7 +50,7 @@ FEAT_HEADER = re.compile(
     flags=re.IGNORECASE,
 )
 FEAT_MSG = re.compile(r'\n\* NEW')
-MAJOR_HEADER = re.compile(r'\nsem-ver:\s*.*break.*\n', flags=re.IGNORECASE)
+MAJOR_HEADER = re.compile(r'\nsem-ver:\s*.*break.*(\n|$)', flags=re.IGNORECASE)
 MAJOR_MSG = re.compile(r'\n\* INCOMPATIBLE')
 
 
