@@ -411,7 +411,7 @@ def is_api_break(commit):
 
 
 def is_feature(commit):
-    return (
+    return bool(
         FEAT_HEADER.search(_to_str(commit.message)) or
         FEAT_MSG.search(_to_str(commit.message))
     )
