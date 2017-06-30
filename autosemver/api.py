@@ -241,14 +241,14 @@ def tag_versions(repo_path):
         ):
             last_maj_version = maj_version
             last_feat_version = feat_version
-            tag_name = 'refs/tags/%d.%d' % (maj_version, feat_version)
+            tag_name = 'refs/tags/v%d.%d' % (maj_version, feat_version)
             if ON_PYTHON3:
                 repo[str.encode(tag_name)] = commit
             else:
                 repo[tag_name] = commit
 
             result.append(
-                '%d.%d -> %s' % (maj_version, feat_version, commit_sha)
+                'v%d.%d -> %s' % (maj_version, feat_version, commit_sha)
             )
 
     return '\n'.join(result)
