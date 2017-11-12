@@ -45,6 +45,19 @@ try:
 except ImportError:
     WITH_GIT = False
 
+PYTHON_34 = (
+    sys.version_info.major == 3 and
+    sys.version_info.minor == 4
+)
+
+if PYTHON_34:
+    # In python 3.4 the reversed function needs a strict sequence.
+    old_reversed = reversed
+
+    def reversed(sequence):
+        return old_reversed(list(sequence))
+
+
 from .git import (  # noqa
     _to_str,
     get_tags,
@@ -191,7 +204,7 @@ def get_current_version(repo_path):
     fix_version = 0
 
     for commit_sha, children in reversed(
-            get_children_per_first_parent(repo_path).items()
+            list(get_children_per_first_parent(repo_path).items())
     ):
         commit = get_repo_object(repo, commit_sha)
         maj_version, feat_version, fix_version = get_version(
