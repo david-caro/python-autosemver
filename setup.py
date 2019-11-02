@@ -49,9 +49,9 @@ else:
         else:
             raise ImportError('Unable to find version for autosemver')
 
-
 if __name__ == '__main__':
     URL = 'https://github.com/david-caro/python-autosemver'
+    LONG_DESCRIPTION = ""
     if not IN_A_PACKAGE:
         with open('AUTHORS', 'w') as authors_fd:
             authors_fd.write('\n'.join(get_authors()))
@@ -61,11 +61,18 @@ if __name__ == '__main__':
                 bugtracker_url=URL + '/issues/'
             ))
 
+        README_PATH = os.path.join(os.path.dirname(__file__), "README.rst")
+        with open(README_PATH, "rb") as readme:
+            LONG_DESCRIPTION = readme.read().decode("UTF-8")
+
+
     setup(
         author='David Caro',
         author_email='david@dcaro.es',
         description='Tools to handle automatic semantic versioning in python',
         install_requires=['dulwich>=0.19.6,<0.20'],
+        long_description=LONG_DESCRIPTION,
+        long_description_content_type="text/x-rst",
         license='GPLv3',
         name='autosemver',
         package_data={'': ['CHANGELOG', 'AUTHORS']},
