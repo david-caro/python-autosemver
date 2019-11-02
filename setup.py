@@ -49,6 +49,9 @@ else:
         else:
             raise ImportError('Unable to find version for autosemver')
 
+README_PATH = os.path.join(os.path.dirname(__file__), "README.rst")
+with open(README_PATH, "rb") as readme:
+    LONG_DESCRIPTION = readme.read().decode("UTF-8")
 
 
 if __name__ == '__main__':
@@ -66,6 +69,8 @@ if __name__ == '__main__':
         author='David Caro',
         author_email='david@dcaro.es',
         description='Tools to handle automatic semantic versioning in python',
+        long_description=LONG_DESCRIPTION,
+        long_description_content_type="text/x-rst",
         install_requires=['dulwich'],
         license='GPLv3',
         name='autosemver',
