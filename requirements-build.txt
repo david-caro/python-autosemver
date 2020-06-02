@@ -1,1 +1,1 @@
-dulwich
+dulwich>=0.19.6,<0.20
