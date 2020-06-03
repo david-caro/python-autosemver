@@ -50,7 +50,6 @@ else:
             raise ImportError('Unable to find version for autosemver')
 
 
-
 if __name__ == '__main__':
     URL = 'https://github.com/david-caro/python-autosemver'
     if not IN_A_PACKAGE:
@@ -66,7 +65,7 @@ if __name__ == '__main__':
         author='David Caro',
         author_email='david@dcaro.es',
         description='Tools to handle automatic semantic versioning in python',
-        install_requires=['dulwich'],
+        install_requires=['dulwich>=0.19.6,<0.20'],
         license='GPLv3',
         name='autosemver',
         package_data={'': ['CHANGELOG', 'AUTHORS']},
