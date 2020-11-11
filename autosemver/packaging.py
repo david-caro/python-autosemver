@@ -32,8 +32,7 @@ import pkg_resources
 from . import api
 
 
-def get_current_version(project_name=None, project_dir=os.curdir,
-                        repo_dir=None):
+def get_current_version(project_name=None, project_dir=os.curdir, repo_dir=None):
     """
     Retrieves the version of the package, checking in this order of priority:
 
@@ -53,19 +52,19 @@ def get_current_version(project_name=None, project_dir=os.curdir,
         RuntimeError: If the version could not be retrieved.
     """
     if project_name is not None:
-        version_env_var = '%s_VERSION' % project_name.upper()
+        version_env_var = "%s_VERSION" % project_name.upper()
 
         if version_env_var in os.environ and os.environ[version_env_var]:
             return os.environ[version_env_var]
 
     version = None
     repo_dir = repo_dir or project_dir
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
     if os.path.exists(pkg_info_file):
         with open(pkg_info_file) as info_fd:
             for line in info_fd.readlines():
-                if line.startswith('Version: '):
-                    version = line.split(' ', 1)[-1]
+                if line.startswith("Version: "):
+                    version = line.split(" ", 1)[-1]
 
     if version is None:
         try:
@@ -83,7 +82,7 @@ def get_current_version(project_name=None, project_dir=os.curdir,
                 pass
 
     if version is None:
-        raise RuntimeError('Failed to get package version')
+        raise RuntimeError("Failed to get package version")
 
     # py3 compatibility step
     if not isinstance(version, str) and isinstance(version, bytes):
@@ -104,8 +103,8 @@ def get_authors(project_dir=os.curdir):
         RuntimeError: If the authors could not be retrieved
     """
     authors = set()
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
-    authors_file = os.path.join(project_dir, 'AUTHORS')
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
+    authors_file = os.path.join(project_dir, "AUTHORS")
     if os.path.exists(pkg_info_file) and os.path.exists(authors_file):
         with open(authors_file) as authors_fd:
             authors = set(authors_fd.read().splitlines())
@@ -115,7 +114,7 @@ def get_authors(project_dir=os.curdir):
     return authors
 
 
-def get_changelog(project_dir=os.curdir, bugtracker_url='', rpm_format=False):
+def get_changelog(project_dir=os.curdir, bugtracker_url="", rpm_format=False):
     """
     Retrieves the changelog, from the CHANGELOG file (if in a package) or
     generates it from the git history. Optionally in rpm-compatible format.
@@ -129,9 +128,9 @@ def get_changelog(project_dir=os.curdir, bugtracker_url='', rpm_format=False):
     :rtype: str
     :rises RuntimeError: If the changelog could not be retrieved
     """
-    changelog = ''
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
-    changelog_file = os.path.join(project_dir, 'CHANGELOG')
+    changelog = ""
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
+    changelog_file = os.path.join(project_dir, "CHANGELOG")
     if os.path.exists(pkg_info_file) and os.path.exists(changelog_file):
         with open(changelog_file) as changelog_fd:
             changelog = changelog_fd.read()
@@ -146,7 +145,7 @@ def get_changelog(project_dir=os.curdir, bugtracker_url='', rpm_format=False):
     return changelog
 
 
-def get_releasenotes(project_dir=os.curdir, bugtracker_url=''):
+def get_releasenotes(project_dir=os.curdir, bugtracker_url=""):
     """
     Retrieves the release notes, from the RELEASE_NOTES file (if in a package)
     or generates it from the git history.
@@ -161,9 +160,9 @@ def get_releasenotes(project_dir=os.curdir, bugtracker_url=''):
     Raises:
         RuntimeError: If the release notes could not be retrieved
     """
-    releasenotes = ''
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
-    releasenotes_file = os.path.join(project_dir, 'RELEASE_NOTES')
+    releasenotes = ""
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
+    releasenotes_file = os.path.join(project_dir, "RELEASE_NOTES")
     if os.path.exists(pkg_info_file) and os.path.exists(releasenotes_file):
         with open(releasenotes_file) as releasenotes_fd:
             releasenotes = releasenotes_fd.read()
@@ -187,20 +186,17 @@ def create_authors(project_dir=os.curdir):
     Raises:
         RuntimeError: If the authors could not be retrieved
     """
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
-    authors_file = os.path.join(project_dir, 'AUTHORS')
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
+    authors_file = os.path.join(project_dir, "AUTHORS")
     if os.path.exists(pkg_info_file):
         return
 
     authors = get_authors(project_dir=project_dir)
-    with open(authors_file, 'wb') as authors_fd:
-        authors_fd.write(
-            b'\n'.join(a.encode('utf-8') for a in authors) + b'\n'
-        )
+    with open(authors_file, "wb") as authors_fd:
+        authors_fd.write(b"\n".join(a.encode("utf-8") for a in authors) + b"\n")
 
 
-def create_changelog(project_dir=os.curdir, bugtracker_url='',
-                     rpm_format=False):
+def create_changelog(project_dir=os.curdir, bugtracker_url="", rpm_format=False):
     """
     Creates the changelog file, if not in a package.
 
@@ -212,21 +208,21 @@ def create_changelog(project_dir=os.curdir, bugtracker_url='',
     :type rpm_format: bool
     :rises RuntimeError: If the changelog could not be retrieved
     """
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
     if os.path.exists(pkg_info_file):
         return
 
-    with open('CHANGELOG', 'wb') as changelog_fd:
+    with open("CHANGELOG", "wb") as changelog_fd:
         changelog_fd.write(
             get_changelog(
                 project_dir=project_dir,
                 bugtracker_url=bugtracker_url,
                 rpm_format=rpm_format,
-            ).encode('utf-8')
+            ).encode("utf-8")
         )
 
 
-def create_releasenotes(project_dir=os.curdir, bugtracker_url=''):
+def create_releasenotes(project_dir=os.curdir, bugtracker_url=""):
     """
     Creates the release notes file, if not in a package.
 
@@ -240,14 +236,15 @@ def create_releasenotes(project_dir=os.curdir, bugtracker_url=''):
     Raises:
         RuntimeError: If the release notes could not be retrieved
     """
-    pkg_info_file = os.path.join(project_dir, 'PKG-INFO')
+    pkg_info_file = os.path.join(project_dir, "PKG-INFO")
     if os.path.exists(pkg_info_file):
         return
 
-    with open('RELEASE_NOTES', 'wb') as releasenotes_fd:
+    with open("RELEASE_NOTES", "wb") as releasenotes_fd:
         releasenotes_fd.write(
             get_releasenotes(
                 project_dir=project_dir,
                 bugtracker_url=bugtracker_url,
-            ).encode('utf-8') + b'\n'
+            ).encode("utf-8")
+            + b"\n"
         )

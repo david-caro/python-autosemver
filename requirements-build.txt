@@ -1,1 +1,2 @@
-dulwich>=0.19.6,<0.20
+dulwich>=0.19.6,<0.20; python_version < '3.0'
+dulwich; python_version > '3.0'

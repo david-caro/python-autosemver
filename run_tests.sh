@@ -23,7 +23,7 @@ result=0
 
 echo '########## Running unit tests'
 pytest \
-    --pep8 \
+    --black \
     --cov=autosemver \
     --cov-report=term-missing \
     -vv \

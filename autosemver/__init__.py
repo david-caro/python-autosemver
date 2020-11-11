@@ -45,7 +45,7 @@ from .packaging import (
     create_releasenotes,
 )
 
-PROJECT_NAME = 'python-autosemver'
+PROJECT_NAME = "python-autosemver"
 
 
 def main(args=None):
@@ -53,48 +53,40 @@ def main(args=None):
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'repo_path', help='Git repo to generate the changelog for.'
-    )
+    parser.add_argument("repo_path", help="Git repo to generate the changelog for.")
     subparsers = parser.add_subparsers()
-    changelog_parser = subparsers.add_parser('changelog')
+    changelog_parser = subparsers.add_parser("changelog")
     changelog_parser.add_argument(
-        '--from-commit',
-        default=None,
-        help='Commit to start the changelog from'
+        "--from-commit", default=None, help="Commit to start the changelog from"
     )
     changelog_parser.add_argument(
-        '--rpm-format',
-        action='store_true',
-        help='If set, the changelog will be rpm friendly.'
+        "--rpm-format",
+        action="store_true",
+        help="If set, the changelog will be rpm friendly.",
     )
     changelog_parser.set_defaults(
         func=lambda *args, **kwargs: get_changelog(*args, **kwargs).strip()
     )
-    version_parser = subparsers.add_parser('version')
+    version_parser = subparsers.add_parser("version")
     version_parser.set_defaults(func=get_current_version)
-    releasenotes_parser = subparsers.add_parser('releasenotes')
+    releasenotes_parser = subparsers.add_parser("releasenotes")
     releasenotes_parser.add_argument(
-        '--from-commit',
-        default=None,
-        help='Commit to start the release notes from.'
+        "--from-commit", default=None, help="Commit to start the release notes from."
     )
     releasenotes_parser.set_defaults(func=get_releasenotes)
-    authors_parser = subparsers.add_parser('authors')
+    authors_parser = subparsers.add_parser("authors")
     authors_parser.add_argument(
-        '--from-commit',
-        default=None,
-        help='Commit to start the authors from.'
+        "--from-commit", default=None, help="Commit to start the authors from."
     )
     authors_parser.set_defaults(
-        func=lambda *args, **kwargs: '\n'.join(get_authors(*args, **kwargs))
+        func=lambda *args, **kwargs: "\n".join(get_authors(*args, **kwargs))
     )
-    tag_parser = subparsers.add_parser('tag')
+    tag_parser = subparsers.add_parser("tag")
     tag_parser.set_defaults(func=tag_versions)
     args = parser.parse_args(args)
 
     params = copy.deepcopy(vars(args))
-    params.pop('func')
+    params.pop("func")
 
     print(_to_str(args.func(**params)))
 
@@ -107,7 +99,10 @@ def distutils_default_case(metadata, attr, value):
 
 
 def distutils_autosemver_case(
-    metadata, with_release_notes=False, with_authors=True, with_changelog=True,
+    metadata,
+    with_release_notes=False,
+    with_authors=True,
+    with_changelog=True,
     bugtracker_url=None,
 ):
     """
@@ -140,25 +135,25 @@ def distutils_autosemver_case(
 def distutils_old_autosemver_case(metadata, attr, value):
     """DEPRECATED"""
     metadata = distutils_default_case(metadata, attr, value)
-    create_changelog(bugtracker_url=getattr(metadata, 'bugtracker_url', ''))
+    create_changelog(bugtracker_url=getattr(metadata, "bugtracker_url", ""))
     return metadata
 
 
 def distutils(dist, attr, value):
-    if attr != 'autosemver':
+    if attr != "autosemver":
         dist.metadata = distutils_default_case(
             metadata=dist.metadata,
             attr=attr,
             value=value,
         )
-    if attr == 'bugtracker_url':
+    if attr == "bugtracker_url":
         warnings.warn(
-            'Using explicit parametes is deprecated and will be removed, '
-            'pass a dictionary as the value of the autosemver parameter '
-            'instead.'
+            "Using explicit parametes is deprecated and will be removed, "
+            "pass a dictionary as the value of the autosemver parameter "
+            "instead."
         )
 
-        if getattr(dist.metadata, '_autosmever', False):
+        if getattr(dist.metadata, "_autosmever", False):
             dist.metadata = distutils_old_autosemver_case(
                 metadata=dist.metadata,
                 attr=attr,
@@ -168,12 +163,9 @@ def distutils(dist, attr, value):
     else:
         if not isinstance(value, dict):
             value = {
-                'bugtracker_url': getattr(dist.metadata, 'bugtracker_url', ''),
+                "bugtracker_url": getattr(dist.metadata, "bugtracker_url", ""),
             }
 
-        dist.metadata = distutils_autosemver_case(
-            metadata=dist.metadata,
-            **value
-        )
+        dist.metadata = distutils_autosemver_case(metadata=dist.metadata, **value)
 
     return

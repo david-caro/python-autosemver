@@ -45,10 +45,7 @@ try:
 except ImportError:
     WITH_GIT = False
 
-PYTHON_34 = (
-    sys.version_info.major == 3 and
-    sys.version_info.minor == 4
-)
+PYTHON_34 = sys.version_info.major == 3 and sys.version_info.minor == 4
 
 if PYTHON_34:
     # In python 3.4 the reversed function needs a strict sequence.
@@ -71,7 +68,7 @@ from .git import (  # noqa
 )
 
 
-ON_PYTHON3 = (sys.version_info >= (3, 0))
+ON_PYTHON3 = sys.version_info >= (3, 0)
 
 
 def _needs_git(func):
@@ -93,8 +90,7 @@ def _needs_git(func):
 
 
 @_needs_git
-def get_changelog(repo_path, from_commit=None, bugtracker_url='',
-                  rpm_format=False):
+def get_changelog(repo_path, from_commit=None, bugtracker_url="", rpm_format=False):
     """
     Given a repo path and an option commit/tag/refspec to start from, will
     get the rpm compatible changelog
@@ -118,7 +114,7 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url='',
     fix_version = 0
     start_including = False
 
-    cur_line = ''
+    cur_line = ""
     if from_commit is None:
         start_including = True
 
@@ -137,11 +133,12 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url='',
             children=children,
         )
         version = (maj_version, feat_version, fix_version)
-        version_str = '%s.%s.%s' % version
+        version_str = "%s.%s.%s" % version
 
         if (
-            start_including or commit_sha.startswith(from_commit) or
-            fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
+            start_including
+            or commit_sha.startswith(from_commit)
+            or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
         ):
             commit_type = get_commit_type(
                 commit=commit,
@@ -173,7 +170,7 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url='',
 
         prev_version = version
 
-    return '\n'.join(reversed(changelog))
+    return "\n".join(reversed(changelog))
 
 
 @_needs_git
@@ -204,7 +201,7 @@ def get_current_version(repo_path):
     fix_version = 0
 
     for commit_sha, children in reversed(
-            list(get_children_per_first_parent(repo_path).items())
+        list(get_children_per_first_parent(repo_path).items())
     ):
         commit = get_repo_object(repo, commit_sha)
         maj_version, feat_version, fix_version = get_version(
@@ -216,7 +213,7 @@ def get_current_version(repo_path):
             children=children,
         )
 
-    return '%s.%s.%s' % (maj_version, feat_version, fix_version)
+    return "%s.%s.%s" % (maj_version, feat_version, fix_version)
 
 
 @_needs_git
@@ -237,7 +234,7 @@ def tag_versions(repo_path):
     result = []
 
     for commit_sha, children in reversed(
-            get_children_per_first_parent(repo_path).items()
+        get_children_per_first_parent(repo_path).items()
     ):
         commit = get_repo_object(repo, commit_sha)
         maj_version, feat_version, fix_version = get_version(
@@ -248,23 +245,18 @@ def tag_versions(repo_path):
             fix_version=fix_version,
             children=children,
         )
-        if (
-            last_maj_version != maj_version or
-            last_feat_version != feat_version
-        ):
+        if last_maj_version != maj_version or last_feat_version != feat_version:
             last_maj_version = maj_version
             last_feat_version = feat_version
-            tag_name = 'refs/tags/v%d.%d' % (maj_version, feat_version)
+            tag_name = "refs/tags/v%d.%d" % (maj_version, feat_version)
             if ON_PYTHON3:
                 repo[str.encode(tag_name)] = commit
             else:
                 repo[tag_name] = commit
 
-            result.append(
-                'v%d.%d -> %s' % (maj_version, feat_version, commit_sha)
-            )
+            result.append("v%d.%d -> %s" % (maj_version, feat_version, commit_sha))
 
-    return '\n'.join(result)
+    return "\n".join(result)
 
 
 @_needs_git
@@ -294,8 +286,9 @@ def get_authors(repo_path, from_commit=None):
     ):
         commit = get_repo_object(repo, commit_sha)
         if (
-            start_including or commit_sha.startswith(from_commit) or
-            fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
+            start_including
+            or commit_sha.startswith(from_commit)
+            or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
         ):
             authors.add(_to_str(commit.author))
             for child in children:
@@ -307,7 +300,7 @@ def get_authors(repo_path, from_commit=None):
 
 
 @_needs_git
-def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
+def get_releasenotes(repo_path, from_commit=None, bugtracker_url=""):
     """
     Given a repo and optionally a base revision to start from, will return
     a text suitable for the relase notes announcement, grouping the bugs, the
@@ -332,12 +325,12 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
     start_including = False
     release_notes_per_major = OrderedDict()
 
-    cur_line = ''
+    cur_line = ""
     if from_commit is None:
         start_including = True
 
     prev_version = (maj_version, feat_version, fix_version)
-    prev_version_str = '%s.%s.%s' % prev_version
+    prev_version_str = "%s.%s.%s" % prev_version
     bugs = []
     features = []
     api_break_changes = []
@@ -355,11 +348,12 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
             children=children,
         )
         version = (maj_version, feat_version, fix_version)
-        version_str = '%s.%s.%s' % version
+        version_str = "%s.%s.%s" % version
 
         if (
-            start_including or commit_sha.startswith(from_commit) or
-            fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
+            start_including
+            or commit_sha.startswith(from_commit)
+            or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
         ):
             start_including = True
 
@@ -388,7 +382,7 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
                     bugtracker_url=bugtracker_url,
                 )
 
-            if parent_commit_type == 'api_break':
+            if parent_commit_type == "api_break":
                 release_notes_per_major[prev_version_str] = (
                     api_break_changes,
                     features,
@@ -396,7 +390,7 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
                 )
                 bugs, features, api_break_changes = [], [], []
                 api_break_changes.append(cur_line)
-            elif parent_commit_type == 'feature':
+            elif parent_commit_type == "feature":
                 features.append(cur_line)
             else:
                 bugs.append(cur_line)
@@ -410,10 +404,10 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=''):
         bugs,
     )
 
-    releasenotes = ''
+    releasenotes = ""
     for major_version, lines in reversed(release_notes_per_major.items()):
         api_break_changes, features, bugs = lines
-        releasenotes += u'''New changes for version %s
+        releasenotes += u"""New changes for version %s
 =================================
 
 API Breaking changes
@@ -426,14 +420,11 @@ Bugfixes and minor changes
 --------------------------
 %s
 
-''' % (
-                major_version,
-                (
-                    '\n'.join(reversed(api_break_changes)) or
-                    'No new API breaking changes\n'
-                ),
-                '\n'.join(reversed(features)) or 'No new features\n',
-                '\n'.join(reversed(bugs)) or 'No new bugs\n',
-            )
+""" % (
+            major_version,
+            ("\n".join(reversed(api_break_changes)) or "No new API breaking changes\n"),
+            "\n".join(reversed(features)) or "No new features\n",
+            "\n".join(reversed(bugs)) or "No new bugs\n",
+        )
 
     return releasenotes.strip()
