@@ -42,3 +42,7 @@ echo '########## Running functional tests'
 bats tests/functional/*test.sh \
 || exit $?
 
+echo
+echo '########## Running type check tests (visualization only)'
+mypy . --ignore-missing-imports \
+|| exit 0

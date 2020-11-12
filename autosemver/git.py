@@ -26,83 +26,83 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """
 Script to generate the version, changelog and releasenotes from the git
 repository.
 """
-from __future__ import print_function
-
 import datetime
 import os
 import re
-from collections import OrderedDict, defaultdict
 
-import dulwich.repo
+
+from collections import defaultdict, OrderedDict
+from typing import (
+    DefaultDict,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Pattern,
+    Set,
+    Tuple,
+    Union,
+)
+
+from dulwich.repo import Commit, Repo
 import dulwich.walk
 
-BUG_URL_REG = re.compile(r".*(closes #|fixes #|adresses #)(?P<bugid>\d+)")
-VALID_TAG = re.compile(r"^v?\d+\.\d+(\.\d+)?$")
-FEAT_HEADER = re.compile(
+BUG_URL_REG: Pattern = re.compile(r".*(closes #|fixes #|adresses #)(?P<bugid>\d+)")
+VALID_TAG: Pattern = re.compile(r"^v?\d+\.\d+(\.\d+)?$")
+FEAT_HEADER: Pattern = re.compile(
     r"\nsem-ver:\s*.*(feature|deprecat).*(\n|$)",
     flags=re.IGNORECASE,
 )
-FEAT_MSG = re.compile(r"\n\* NEW")
-MAJOR_HEADER = re.compile(r"\nsem-ver:\s*.*break.*(\n|$)", flags=re.IGNORECASE)
-MAJOR_MSG = re.compile(r"\n\* INCOMPATIBLE")
+FEAT_MSG: Pattern = re.compile(r"\n\* NEW")
+MAJOR_HEADER: Pattern = re.compile(r"\nsem-ver:\s*.*break.*(\n|$)", flags=re.IGNORECASE)
+MAJOR_MSG: Pattern = re.compile(r"\n\* INCOMPATIBLE")
 
 
-def _to_str(maybe_str):
-    # python3 support magic
-    try:
-        assert isinstance(u"", str)
-        unicode = type(None)
-    except AssertionError:
-        unicode = type(u"")
-
-    if isinstance(maybe_str, unicode):
-        maybe_str = maybe_str.encode("utf-8")
-
-    else:
-        try:
-            maybe_str = maybe_str.decode("utf-8")
-        except (UnicodeDecodeError, UnicodeEncodeError, AttributeError):
-            pass
-
+def _to_str(maybe_str: Union[bytes, str]) -> str:
+    if isinstance(maybe_str, bytes):
+        return maybe_str.decode("utf-8")
     return maybe_str
 
 
-def _tag2tuple(tag):
-    feat_version = 0
-    fix_version = 0
+def _tag2tuple(
+    tag: str,
+) -> Tuple[int, int, int]:
+    raw_feat_version = "0"
+    raw_fix_version = "0"
     version = tag.split(".")
     if len(version) == 1:
-        maj_version = version[0]
+        raw_maj_version = version[0]
     if len(version) == 2:
-        maj_version, feat_version = version
+        raw_maj_version, raw_feat_version = version
     if len(version) == 3:
-        maj_version, feat_version, fix_version = version
+        raw_maj_version, raw_feat_version, raw_fix_version = version
 
-    if maj_version.startswith("v"):
-        maj_version = maj_version[1:]
+    if raw_maj_version.startswith("v"):
+        raw_maj_version = raw_maj_version[1:]
 
-    maj_version = int(maj_version)
-    feat_version = int(feat_version)
-    fix_version = int(fix_version)
+    maj_version = int(raw_maj_version)
+    feat_version = int(raw_feat_version)
+    fix_version = int(raw_fix_version)
 
     return maj_version, feat_version, fix_version
 
 
-def get_repo_object(repo, object_name):
-    try:
+def get_repo_object(repo: Repo, object_name: Union[str, bytes]) -> Commit:
+    if isinstance(object_name, str):
         object_name = object_name.encode()
-    except:
-        pass
 
-    return repo.get_object(object_name)
+    gotten_object = repo.get_object(object_name)
+    if isinstance(gotten_object, Commit):
+        return gotten_object
+
+    raise RuntimeError(f"Got non-commit object {gotten_object}")
 
 
-def split_line(what, indent="", cols=79):
+def split_line(what: str, indent: str = "", cols: int = 79) -> Tuple[str, str]:
     """Split a line on the closest space, or break the last word with '-'.
 
     Args:
@@ -152,7 +152,7 @@ def split_line(what, indent="", cols=79):
     return what.lstrip(), new_line.rstrip()
 
 
-def fit_to_cols(what, indent="", cols=79):
+def fit_to_cols(what: str, indent: str = "", cols: int = 79) -> str:
     """Wrap the given text to the columns, prepending the indent to each line.
 
     Args:
@@ -175,8 +175,8 @@ def fit_to_cols(what, indent="", cols=79):
     return "\n".join(lines)
 
 
-def get_bugs_from_commit_msg(commit_msg):
-    bugs = []
+def get_bugs_from_commit_msg(commit_msg: str) -> List[str]:
+    bugs: List[str] = []
     for line in _to_str(commit_msg).split("\n"):
         match = BUG_URL_REG.match(_to_str(line))
         if match:
@@ -185,15 +185,18 @@ def get_bugs_from_commit_msg(commit_msg):
 
 
 def pretty_commit(
-    commit, version=None, commit_type="bug", bugtracker_url="", rpm_format=False
-):
-    message = _to_str(commit.message)
-    subject = _to_str(commit.message).split("\n", 1)[0]  # noqa
-    short_hash = commit.sha().hexdigest()[:8]  # noqa
-    author = _to_str(commit.author)  # noqa
-    author_date = datetime.datetime.fromtimestamp(  # noqa
-        int(commit.commit_time)
-    ).strftime("%a %b %d %Y")
+    commit: Commit,
+    version: Optional[str] = None,
+    commit_type: str = "bug",
+    bugtracker_url: str = "",
+    rpm_format: bool = False,
+) -> str:
+    subject = _to_str(commit.message).split("\n", 1)[0]
+    short_hash = commit.sha().hexdigest()[:8]
+    author = _to_str(commit.author)
+    author_date = datetime.datetime.fromtimestamp(int(commit.commit_time)).strftime(
+        "%a %b %d %Y"
+    )
     bugs = get_bugs_from_commit_msg(commit.message)
     if bugs:
         changelog_bugs = (
@@ -211,7 +214,7 @@ def pretty_commit(
             + "\n"
         )
     else:
-        changelog_bugs = ""  # noqa
+        changelog_bugs = ""
 
     feature_header = ""
     if commit_type == "feature":
@@ -221,46 +224,47 @@ def pretty_commit(
     else:
         feature_header = "MINOR"
 
-    changelog_message = fit_to_cols(  # noqa
-        u"{feature_header} {short_hash}: {subject}".format(**vars()),
+    changelog_message = fit_to_cols(
+        f"{feature_header} {short_hash}: {subject}",
         indent="    ",
     )
 
     if rpm_format:
         return (
-            (u"* {author_date} {author} - {version}\n" if version is not None else "")
-            + "{changelog_message}\n"
-            + "{changelog_bugs}"
-        ).format(**vars())
+            (f"* {author_date} {author} - {version}\n" if version is not None else "")
+            + f"{changelog_message}\n"
+            + f"{changelog_bugs}"
+        )
 
     return (
-        (u'* {version} "{author}"\n' if version is not None else "")
-        + "{changelog_message}\n"
-        + "{changelog_bugs}"
-    ).format(**vars())
+        (f'* {version} "{author}"\n' if version is not None else "")
+        + f"{changelog_message}\n"
+        + f"{changelog_bugs}"
+    )
 
 
-def get_tags(repo):
-    tags = {}
+def get_tags(repo: Repo) -> Dict[str, str]:
+    tags: Dict[str, str] = {}
     for tag_ref, commit in repo.get_refs().items():
-        tag_ref = _to_str(tag_ref)
-        if tag_ref.startswith("refs/tags/") and VALID_TAG.match(
-            tag_ref[len("refs/tags/") :]
+        tag_ref_str = _to_str(tag_ref)
+        if tag_ref_str.startswith("refs/tags/") and VALID_TAG.match(
+            tag_ref_str[len("refs/tags/") :]
         ):
-            tags[_to_str(commit)] = os.path.basename(tag_ref)
+            tags[_to_str(commit)] = os.path.basename(tag_ref_str)
 
     return tags
 
 
-def get_refs(repo):
-    refs = defaultdict(set)
+def get_refs(repo: Repo) -> DefaultDict[str, Set[str]]:
+    refs: DefaultDict[str, Set[str]] = defaultdict(set)
     for ref, commit in repo.get_refs().items():
-        refs[commit].add(commit)
-        refs[commit].add(ref)
+        str_commit = _to_str(commit)
+        refs[str_commit].add(str_commit)
+        refs[str_commit].add(_to_str(ref))
     return refs
 
 
-def fuzzy_matches_ref(fuzzy_ref, ref):
+def fuzzy_matches_ref(fuzzy_ref: str, ref: str) -> bool:
     cur_section = ""
     for path_section in reversed(_to_str(ref).split("/")):
         cur_section = os.path.normpath(os.path.join(path_section, cur_section))
@@ -269,13 +273,13 @@ def fuzzy_matches_ref(fuzzy_ref, ref):
     return False
 
 
-def fuzzy_matches_refs(fuzzy_ref, refs):
+def fuzzy_matches_refs(fuzzy_ref: str, refs: Iterable[str]) -> bool:
     return any(fuzzy_matches_ref(fuzzy_ref, ref) for ref in refs)
 
 
-def get_children_per_parent(repo_path):
-    repo = dulwich.repo.Repo(repo_path)
-    children_per_parent = defaultdict(set)
+def get_children_per_parent(repo_path: str) -> DefaultDict[str, Set[str]]:
+    repo = Repo(repo_path)
+    children_per_parent: DefaultDict[str, Set[str]] = defaultdict(set)
 
     for entry in repo.get_walker(order=dulwich.walk.ORDER_TOPO):
         for parent in entry.commit.parents:
@@ -284,10 +288,10 @@ def get_children_per_parent(repo_path):
     return children_per_parent
 
 
-def get_first_parents(repo_path):
-    repo = dulwich.repo.Repo(repo_path)
+def get_first_parents(repo_path: str) -> List[str]:
+    repo = Repo(repo_path)
     #: these are the commits that are parents of more than one other commit
-    first_parents = []
+    first_parents: List[str] = []
     on_merge = False
 
     for entry in repo.get_walker(order=dulwich.walk.ORDER_TOPO):
@@ -315,14 +319,23 @@ def get_first_parents(repo_path):
     return first_parents
 
 
-def has_firstparent_child(sha, first_parents, parents_per_child):
+def has_firstparent_child(
+    sha: str,
+    first_parents: List[str],
+    parents_per_child: DefaultDict[str, Set[str]],
+) -> bool:
     return any(child for child in parents_per_child[sha] if child in first_parents)
 
 
-def get_merged_commits(repo, commit, first_parents, children_per_parent):
-    merge_children = set()
+def get_merged_commits(
+    repo: Repo,
+    commit: Commit,
+    first_parents: List[str],
+    children_per_parent: DefaultDict[str, Set[str]],
+) -> Set[str]:
+    merge_children: Set[str] = set()
 
-    to_explore = set([commit.sha().hexdigest()])
+    to_explore: Set[str] = set([commit.sha().hexdigest()])
 
     while to_explore:
         next_sha = to_explore.pop()
@@ -350,11 +363,11 @@ def get_merged_commits(repo, commit, first_parents, children_per_parent):
     return merge_children
 
 
-def get_children_per_first_parent(repo_path):
-    repo = dulwich.repo.Repo(repo_path)
+def get_children_per_first_parent(repo_path: str) -> "OrderedDict[str, List[Commit]]":
+    repo = Repo(repo_path)
     first_parents = get_first_parents(repo_path)
     children_per_parent = get_children_per_parent(repo_path)
-    children_per_first_parent = OrderedDict()
+    children_per_first_parent: "OrderedDict[str, List[Commit]]" = OrderedDict()
 
     for first_parent in first_parents:
         try:
@@ -380,11 +393,15 @@ def get_children_per_first_parent(repo_path):
 
 
 def get_version(
-    commit, tags, maj_version=0, feat_version=0, fix_version=0, children=None
-):
-    children = children or []
-    commit_type = get_commit_type(commit, children)
-    commit_sha = commit.sha().hexdigest()
+    commit: Commit,
+    tags: Dict[str, str],
+    maj_version: int = 0,
+    feat_version: int = 0,
+    fix_version: int = 0,
+    children: Optional[List[Commit]] = None,
+) -> Tuple[int, int, int]:
+    commit_type: str = get_commit_type(commit, children)
+    commit_sha: str = commit.sha().hexdigest()
 
     if commit_sha in tags:
         maj_version, feat_version, fix_version = _tag2tuple(tags[commit_sha])
@@ -402,27 +419,29 @@ def get_version(
     return version
 
 
-def is_api_break(commit):
+def is_api_break(commit: Commit) -> bool:
     return bool(
         MAJOR_HEADER.search(_to_str(commit.message))
         or MAJOR_MSG.search(_to_str(commit.message))
     )
 
 
-def is_feature(commit):
+def is_feature(commit: Commit) -> bool:
     return bool(
         FEAT_HEADER.search(_to_str(commit.message))
         or FEAT_MSG.search(_to_str(commit.message))
     )
 
 
-def get_commit_type(commit, children=None, tags=None, prev_version=None):
-    children = children or []
-    tags = tags or []
-    prev_version = prev_version or (0, 0, 0)
-    commit_sha = commit.sha().hexdigest()
+def get_commit_type(
+    commit: Commit,
+    children: Optional[List[Commit]] = None,
+    tags: Optional[Dict[str, str]] = None,
+    prev_version: Tuple[int, int, int] = (0, 0, 0),
+) -> str:
+    commit_sha: str = commit.sha().hexdigest()
 
-    if commit_sha in tags:
+    if tags and commit_sha in tags:
         maj_version, feat_version, _ = _tag2tuple(tags[commit_sha])
         if maj_version > prev_version[0]:
             return "api_break"
@@ -430,9 +449,13 @@ def get_commit_type(commit, children=None, tags=None, prev_version=None):
             return "feature"
         return "bug"
 
-    if any(is_api_break(child) for child in children + [commit]):
+    history_until_now: List[Commit] = [commit]
+    if children:
+        history_until_now = children + history_until_now
+
+    if any(is_api_break(cur_commit) for cur_commit in history_until_now):
         return "api_break"
-    elif any(is_feature(child) for child in children + [commit]):
+    elif any(is_feature(cur_commit) for cur_commit in history_until_now):
         return "feature"
     else:
         return "bug"

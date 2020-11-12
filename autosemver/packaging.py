@@ -27,12 +27,18 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 import os
+import sys
 import pkg_resources
+from typing import Set, Optional
 
 from . import api
 
 
-def get_current_version(project_name=None, project_dir=os.curdir, repo_dir=None):
+def get_current_version(
+    project_name: Optional[str] = None,
+    project_dir: str = os.curdir,
+    repo_dir: Optional[str] = None,
+) -> str:
     """
     Retrieves the version of the package, checking in this order of priority:
 
@@ -69,17 +75,25 @@ def get_current_version(project_name=None, project_dir=os.curdir, repo_dir=None)
     if version is None:
         try:
             version = api.get_current_version(repo_path=repo_dir)
-        except:
+        except Exception:
             pass
 
     if version is None:
         if project_name:
-            try:
-                distribution = pkg_resources.get_distribution(project_name)
-                if distribution.has_version():
+            if sys.version_info > (3, 8):
+                try:
+                    import importlib.metadata
+
+                    version = importlib.metadata.version(project_name)
+                except Exception:
+                    raise
+            else:
+                try:
+                    # deprecated
+                    distribution = pkg_resources.get_distribution(project_name)
                     version = distribution.version
-            except:
-                pass
+                except Exception:
+                    raise
 
     if version is None:
         raise RuntimeError("Failed to get package version")
@@ -91,7 +105,7 @@ def get_current_version(project_name=None, project_dir=os.curdir, repo_dir=None)
     return version
 
 
-def get_authors(project_dir=os.curdir):
+def get_authors(project_dir: str = os.curdir) -> Set[str]:
     """
     Retrieves the authors list, from the AUTHORS file (if in a package) or
     generates it from the git history.
@@ -114,7 +128,11 @@ def get_authors(project_dir=os.curdir):
     return authors
 
 
-def get_changelog(project_dir=os.curdir, bugtracker_url="", rpm_format=False):
+def get_changelog(
+    project_dir: str = os.curdir,
+    bugtracker_url: str = "",
+    rpm_format: bool = False,
+) -> str:
     """
     Retrieves the changelog, from the CHANGELOG file (if in a package) or
     generates it from the git history. Optionally in rpm-compatible format.
@@ -145,7 +163,7 @@ def get_changelog(project_dir=os.curdir, bugtracker_url="", rpm_format=False):
     return changelog
 
 
-def get_releasenotes(project_dir=os.curdir, bugtracker_url=""):
+def get_releasenotes(project_dir: str = os.curdir, bugtracker_url: str = "") -> str:
     """
     Retrieves the release notes, from the RELEASE_NOTES file (if in a package)
     or generates it from the git history.
@@ -176,7 +194,7 @@ def get_releasenotes(project_dir=os.curdir, bugtracker_url=""):
     return releasenotes
 
 
-def create_authors(project_dir=os.curdir):
+def create_authors(project_dir: str = os.curdir) -> None:
     """
     Creates the authors file, if not in a package.
 
@@ -196,7 +214,11 @@ def create_authors(project_dir=os.curdir):
         authors_fd.write(b"\n".join(a.encode("utf-8") for a in authors) + b"\n")
 
 
-def create_changelog(project_dir=os.curdir, bugtracker_url="", rpm_format=False):
+def create_changelog(
+    project_dir: str = os.curdir,
+    bugtracker_url: str = "",
+    rpm_format: bool = False,
+) -> None:
     """
     Creates the changelog file, if not in a package.
 
@@ -222,7 +244,7 @@ def create_changelog(project_dir=os.curdir, bugtracker_url="", rpm_format=False)
         )
 
 
-def create_releasenotes(project_dir=os.curdir, bugtracker_url=""):
+def create_releasenotes(project_dir: str = os.curdir, bugtracker_url: str = "") -> None:
     """
     Creates the release notes file, if not in a package.
 

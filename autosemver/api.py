@@ -26,33 +26,21 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """
 Script to generate the version, changelog and releasenotes from the git
 repository.
 """
-from __future__ import print_function
-
-import sys
-
 from collections import OrderedDict
 from functools import wraps
+from typing import Callable, Optional, List, Set, Tuple
 
-WITH_GIT = True
+
+WITH_GIT: bool = True
 try:
     import dulwich.repo
     import dulwich.walk
 except ImportError:
     WITH_GIT = False
-
-PYTHON_34 = sys.version_info.major == 3 and sys.version_info.minor == 4
-
-if PYTHON_34:
-    # In python 3.4 the reversed function needs a strict sequence.
-    old_reversed = reversed
-
-    def reversed(sequence):
-        return old_reversed(list(sequence))
 
 
 from .git import (  # noqa
@@ -68,10 +56,7 @@ from .git import (  # noqa
 )
 
 
-ON_PYTHON3 = sys.version_info >= (3, 0)
-
-
-def _needs_git(func):
+def _needs_git(func: Callable) -> Callable:
     """
     Small decorator to make sure we have the git repo, or report error
     otherwise.
@@ -90,7 +75,12 @@ def _needs_git(func):
 
 
 @_needs_git
-def get_changelog(repo_path, from_commit=None, bugtracker_url="", rpm_format=False):
+def get_changelog(
+    repo_path: str,
+    from_commit: Optional[str] = None,
+    bugtracker_url: str = "",
+    rpm_format: bool = False,
+) -> str:
     """
     Given a repo path and an option commit/tag/refspec to start from, will
     get the rpm compatible changelog
@@ -108,15 +98,13 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url="", rpm_format=Fal
     repo = dulwich.repo.Repo(repo_path)
     tags = get_tags(repo)
     refs = get_refs(repo)
-    changelog = []
+    changelog: List[str] = []
     maj_version = 0
     feat_version = 0
     fix_version = 0
     start_including = False
 
     cur_line = ""
-    if from_commit is None:
-        start_including = True
 
     prev_version = (maj_version, feat_version, fix_version)
 
@@ -135,11 +123,16 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url="", rpm_format=Fal
         version = (maj_version, feat_version, fix_version)
         version_str = "%s.%s.%s" % version
 
-        if (
-            start_including
-            or commit_sha.startswith(from_commit)
-            or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
-        ):
+        if from_commit is None:
+            start_including = True
+        else:
+            start_including = (
+                start_including
+                or commit_sha.startswith(from_commit)
+                or fuzzy_matches_refs(from_commit, refs[commit_sha])
+            )
+
+        if start_including:
             commit_type = get_commit_type(
                 commit=commit,
                 children=children,
@@ -165,7 +158,6 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url="", rpm_format=Fal
                     commit_type=commit_type,
                     bugtracker_url=bugtracker_url,
                 )
-            start_including = True
             changelog.append(cur_line)
 
         prev_version = version
@@ -174,7 +166,7 @@ def get_changelog(repo_path, from_commit=None, bugtracker_url="", rpm_format=Fal
 
 
 @_needs_git
-def get_current_version(repo_path):
+def get_current_version(repo_path: str) -> str:
     """
     Given a repo will return the version string, according to semantic
     versioning, counting as non-backwards compatible commit any one with a
@@ -217,7 +209,7 @@ def get_current_version(repo_path):
 
 
 @_needs_git
-def tag_versions(repo_path):
+def tag_versions(repo_path: str) -> str:
     """
     Given a repo will add a tag for each major version.
 
@@ -231,7 +223,7 @@ def tag_versions(repo_path):
     fix_version = 0
     last_maj_version = 0
     last_feat_version = 0
-    result = []
+    result: List[str] = []
 
     for commit_sha, children in reversed(
         get_children_per_first_parent(repo_path).items()
@@ -249,10 +241,7 @@ def tag_versions(repo_path):
             last_maj_version = maj_version
             last_feat_version = feat_version
             tag_name = "refs/tags/v%d.%d" % (maj_version, feat_version)
-            if ON_PYTHON3:
-                repo[str.encode(tag_name)] = commit
-            else:
-                repo[tag_name] = commit
+            repo[str.encode(tag_name)] = commit
 
             result.append("v%d.%d -> %s" % (maj_version, feat_version, commit_sha))
 
@@ -260,7 +249,7 @@ def tag_versions(repo_path):
 
 
 @_needs_git
-def get_authors(repo_path, from_commit=None):
+def get_authors(repo_path: str, from_commit: Optional[str] = None) -> List[str]:
     """
     Given a repo and optionally a base revision to start from, will return
     the list of authors.
@@ -276,31 +265,33 @@ def get_authors(repo_path, from_commit=None):
     repo = dulwich.repo.Repo(repo_path)
     refs = get_refs(repo)
     start_including = False
-    authors = set()
-
-    if from_commit is None:
-        start_including = True
+    authors: Set[str] = set()
 
     for commit_sha, children in reversed(
         get_children_per_first_parent(repo_path).items()
     ):
         commit = get_repo_object(repo, commit_sha)
-        if (
-            start_including
-            or commit_sha.startswith(from_commit)
-            or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
-        ):
+        if from_commit is None:
+            start_including = True
+        else:
+            start_including = (
+                start_including
+                or commit_sha.startswith(from_commit)
+                or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
+            )
+
+        if start_including:
             authors.add(_to_str(commit.author))
             for child in children:
                 authors.add(_to_str(child.author))
-
-            start_including = True
 
     return sorted(authors)
 
 
 @_needs_git
-def get_releasenotes(repo_path, from_commit=None, bugtracker_url=""):
+def get_releasenotes(
+    repo_path: str, from_commit: Optional[str] = None, bugtracker_url: str = ""
+) -> str:
     """
     Given a repo and optionally a base revision to start from, will return
     a text suitable for the relase notes announcement, grouping the bugs, the
@@ -323,17 +314,16 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=""):
     feat_version = 0
     fix_version = 0
     start_including = False
-    release_notes_per_major = OrderedDict()
-
+    release_notes_per_major: OrderedDict[
+        str, Tuple[List[str], List[str], List[str]]
+    ] = OrderedDict()
     cur_line = ""
-    if from_commit is None:
-        start_including = True
 
     prev_version = (maj_version, feat_version, fix_version)
     prev_version_str = "%s.%s.%s" % prev_version
-    bugs = []
-    features = []
-    api_break_changes = []
+    bugs: List[str] = []
+    features: List[str] = []
+    api_break_changes: List[str] = []
 
     for commit_sha, children in reversed(
         get_children_per_first_parent(repo_path).items()
@@ -350,13 +340,16 @@ def get_releasenotes(repo_path, from_commit=None, bugtracker_url=""):
         version = (maj_version, feat_version, fix_version)
         version_str = "%s.%s.%s" % version
 
-        if (
-            start_including
-            or commit_sha.startswith(from_commit)
-            or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
-        ):
+        if from_commit is None:
             start_including = True
+        else:
+            start_including = (
+                start_including
+                or commit_sha.startswith(from_commit)
+                or fuzzy_matches_refs(from_commit, refs.get(commit_sha, []))
+            )
 
+        if start_including:
             parent_commit_type = get_commit_type(
                 commit=commit,
                 children=children,

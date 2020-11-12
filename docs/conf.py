@@ -18,11 +18,13 @@
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307, USA.
 
-from __future__ import print_function
-
 import os
 
-from autosemver.packaging import get_changelog, get_current_version, get_releasenotes
+from autosemver.packaging import (
+    get_changelog,
+    get_current_version,
+    get_releasenotes,
+)
 
 
 if not os.path.exists("_build/html/_static"):
@@ -265,13 +267,13 @@ htmlhelp_basename = "autosemver_namedoc"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
+    # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
+    # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
+    # 'preamble': '',
     # Latex figure (float) alignment
-    #'figure_align': 'htbp',
+    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

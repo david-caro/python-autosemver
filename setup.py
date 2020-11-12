@@ -68,7 +68,7 @@ if __name__ == "__main__":
         author="David Caro",
         author_email="david@dcaro.es",
         description="Tools to handle automatic semantic versioning in python",
-        install_requires=["dulwich>=0.19.6,<0.20"],
+        install_requires=["dulwich>=0.19.6"],
         long_description=LONG_DESCRIPTION,
         long_description_content_type="text/x-rst",
         license="GPLv3",
