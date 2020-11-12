@@ -28,8 +28,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 import os
 import sys
+from typing import Optional, Set
+
 import pkg_resources
-from typing import Set, Optional
 
 from . import api
 

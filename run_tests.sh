@@ -33,6 +33,11 @@ pytest \
 || exit $?
 
 echo
+echo '########## Running import format checks'
+isort --check-only --diff . \
+|| exit $?
+
+echo
 echo '########## Building docs'
 sphinx-build -qnN docs docs/_build/html \
 || exit $?

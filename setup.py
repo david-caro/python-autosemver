@@ -33,11 +33,7 @@ IN_A_PACKAGE = False
 PKG_INFO = os.path.join(os.path.dirname("__file__"), "PKG-INFO")
 if not os.path.exists(PKG_INFO):
     from autosemver import PROJECT_NAME
-    from autosemver.packaging import (
-        get_authors,
-        get_changelog,
-        get_current_version,
-    )
+    from autosemver.packaging import get_authors, get_changelog, get_current_version
 
     __version__ = get_current_version(project_name=PROJECT_NAME)
 else:

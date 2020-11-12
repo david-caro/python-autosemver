@@ -33,9 +33,7 @@ repository.
 import datetime
 import os
 import re
-
-
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from typing import (
     DefaultDict,
     Dict,
@@ -48,8 +46,8 @@ from typing import (
     Union,
 )
 
-from dulwich.repo import Commit, Repo
 import dulwich.walk
+from dulwich.repo import Commit, Repo
 
 BUG_URL_REG: Pattern = re.compile(r".*(closes #|fixes #|adresses #)(?P<bugid>\d+)")
 VALID_TAG: Pattern = re.compile(r"^v?\d+\.\d+(\.\d+)?$")

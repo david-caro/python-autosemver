@@ -24,13 +24,12 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+import argparse
 import copy
 import sys
 import warnings
-from typing import Any, Optional, List
 from distutils.dist import Distribution, DistributionMetadata
-
-import argparse
+from typing import Any, List, Optional
 
 from .api import (
     get_authors,
@@ -41,10 +40,10 @@ from .api import (
 )
 from .git import _to_str
 from .packaging import (
-    get_current_version as pkg_version,
     create_authors,
     create_changelog,
     create_releasenotes,
+    get_current_version as pkg_version,
 )
 
 PROJECT_NAME = "python-autosemver"

@@ -20,12 +20,7 @@
 
 import os
 
-from autosemver.packaging import (
-    get_changelog,
-    get_current_version,
-    get_releasenotes,
-)
-
+from autosemver.packaging import get_changelog, get_current_version, get_releasenotes
 
 if not os.path.exists("_build/html/_static"):
     os.makedirs("_build/html/_static")
@@ -83,9 +78,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"autosemver"
-copyright = u"2016, David Caro"
-author = u"David Caro"
+project = "autosemver"
+copyright = "2016, David Caro"
+author = "David Caro"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -283,8 +278,8 @@ latex_documents = [
     (
         master_doc,
         "autosemver.tex",
-        u"Autosemver Documentation",
-        u"David Caro",
+        "Autosemver Documentation",
+        "David Caro",
         "manual",
     ),
 ]
@@ -314,7 +309,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "autosemver", u"Autosemver Documentation", [author], 1)]
+man_pages = [(master_doc, "autosemver", "Autosemver Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -329,7 +324,7 @@ texinfo_documents = [
     (
         master_doc,
         "autosemver",
-        u"Autosemver Documentation",
+        "Autosemver Documentation",
         author,
         "autosemver",
         "Automatic semantic versioning for python.",

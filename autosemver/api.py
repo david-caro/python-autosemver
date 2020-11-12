@@ -32,8 +32,7 @@ repository.
 """
 from collections import OrderedDict
 from functools import wraps
-from typing import Callable, Optional, List, Set, Tuple
-
+from typing import Callable, List, Optional, Set, Tuple
 
 WITH_GIT: bool = True
 try:
@@ -45,13 +44,13 @@ except ImportError:
 
 from .git import (  # noqa
     _to_str,
-    get_tags,
-    get_refs,
-    get_children_per_first_parent,
-    get_repo_object,
-    get_version,
     fuzzy_matches_refs,
+    get_children_per_first_parent,
     get_commit_type,
+    get_refs,
+    get_repo_object,
+    get_tags,
+    get_version,
     pretty_commit,
 )
 
@@ -400,7 +399,7 @@ def get_releasenotes(
     releasenotes = ""
     for major_version, lines in reversed(release_notes_per_major.items()):
         api_break_changes, features, bugs = lines
-        releasenotes += u"""New changes for version %s
+        releasenotes += """New changes for version %s
 =================================
 
 API Breaking changes
