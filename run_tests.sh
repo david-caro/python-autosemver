@@ -23,13 +23,18 @@ result=0
 
 echo '########## Running unit tests'
 pytest \
-    --pep8 \
+    --black \
     --cov=autosemver \
     --cov-report=term-missing \
     -vv \
     "$@" \
     tests/unit \
     autosemver \
+|| exit $?
+
+echo
+echo '########## Running import format checks'
+isort --check-only --diff . \
 || exit $?
 
 echo
@@ -42,3 +47,7 @@ echo '########## Running functional tests'
 bats tests/functional/*test.sh \
 || exit $?
 
+echo
+echo '########## Running type check tests (visualization only)'
+mypy . --ignore-missing-imports \
+|| exit 0

@@ -48,7 +48,6 @@ load common
 
     expected_version="6.2.3"
     version="$(python -c '
-from __future__ import print_function;
 import dummytest
 print(dummytest.__version__)')"
 

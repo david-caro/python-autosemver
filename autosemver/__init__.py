@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # This file was part of lago project.
@@ -23,12 +24,12 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
+import argparse
 import copy
 import sys
 import warnings
-
-import argparse
+from distutils.dist import Distribution, DistributionMetadata
+from typing import Any, List, Optional
 
 from .api import (
     get_authors,
@@ -39,67 +40,65 @@ from .api import (
 )
 from .git import _to_str
 from .packaging import (
-    get_current_version as pkg_version,
     create_authors,
     create_changelog,
     create_releasenotes,
+    get_current_version as pkg_version,
 )
 
-PROJECT_NAME = 'python-autosemver'
+PROJECT_NAME = "python-autosemver"
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     if args is None:
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'repo_path', help='Git repo to generate the changelog for.'
-    )
+    parser.add_argument("repo_path", help="Git repo to generate the changelog for.")
     subparsers = parser.add_subparsers()
-    changelog_parser = subparsers.add_parser('changelog')
+    changelog_parser = subparsers.add_parser("changelog")
     changelog_parser.add_argument(
-        '--from-commit',
+        "--from-commit",
         default=None,
-        help='Commit to start the changelog from'
+        help="Commit to start the changelog from",
     )
     changelog_parser.add_argument(
-        '--rpm-format',
-        action='store_true',
-        help='If set, the changelog will be rpm friendly.'
+        "--rpm-format",
+        action="store_true",
+        help="If set, the changelog will be rpm friendly.",
     )
     changelog_parser.set_defaults(
         func=lambda *args, **kwargs: get_changelog(*args, **kwargs).strip()
     )
-    version_parser = subparsers.add_parser('version')
+    version_parser = subparsers.add_parser("version")
     version_parser.set_defaults(func=get_current_version)
-    releasenotes_parser = subparsers.add_parser('releasenotes')
+    releasenotes_parser = subparsers.add_parser("releasenotes")
     releasenotes_parser.add_argument(
-        '--from-commit',
+        "--from-commit",
         default=None,
-        help='Commit to start the release notes from.'
+        help="Commit to start the release notes from.",
     )
     releasenotes_parser.set_defaults(func=get_releasenotes)
-    authors_parser = subparsers.add_parser('authors')
+    authors_parser = subparsers.add_parser("authors")
     authors_parser.add_argument(
-        '--from-commit',
-        default=None,
-        help='Commit to start the authors from.'
+        "--from-commit", default=None, help="Commit to start the authors from."
     )
     authors_parser.set_defaults(
-        func=lambda *args, **kwargs: '\n'.join(get_authors(*args, **kwargs))
+        func=lambda *args, **kwargs: "\n".join(get_authors(*args, **kwargs))
     )
-    tag_parser = subparsers.add_parser('tag')
+    tag_parser = subparsers.add_parser("tag")
     tag_parser.set_defaults(func=tag_versions)
-    args = parser.parse_args(args)
+    parsed_args = parser.parse_args(args)
 
-    params = copy.deepcopy(vars(args))
-    params.pop('func')
+    params = copy.deepcopy(vars(parsed_args))
+    params.pop("func")
 
-    print(_to_str(args.func(**params)))
+    print(_to_str(parsed_args.func(**params)))
 
 
-def distutils_default_case(metadata, attr, value):
+def distutils_default_case(
+    metadata: DistributionMetadata, attr: str, value: Any
+) -> DistributionMetadata:
     if value:
         setattr(metadata, attr, value)
 
@@ -107,11 +106,15 @@ def distutils_default_case(metadata, attr, value):
 
 
 def distutils_autosemver_case(
-    metadata, with_release_notes=False, with_authors=True, with_changelog=True,
-    bugtracker_url=None,
-):
+    metadata: DistributionMetadata,
+    with_release_notes: bool = False,
+    with_authors: bool = True,
+    with_changelog: bool = True,
+    bugtracker_url: Optional[str] = None,
+) -> DistributionMetadata:
     """
-    :param metadata: distutils metadata object.
+    :param metadata: DistributionMetadata object.
+    :type metadata: DistributionMetadata
     :param with_release_notes: if true, will create the release notes.
     :type with_release_notes: bool
     :param with_authors: if true, will create the authors file.
@@ -132,48 +135,23 @@ def distutils_autosemver_case(
     if with_changelog:
         create_changelog()
 
-    metadata._autosmever = True
-
     return metadata
 
 
-def distutils_old_autosemver_case(metadata, attr, value):
-    """DEPRECATED"""
-    metadata = distutils_default_case(metadata, attr, value)
-    create_changelog(bugtracker_url=getattr(metadata, 'bugtracker_url', ''))
-    return metadata
-
-
-def distutils(dist, attr, value):
-    if attr != 'autosemver':
+def distutils(dist: Distribution, attr: str, value: Any) -> None:
+    if attr != "autosemver":
         dist.metadata = distutils_default_case(
             metadata=dist.metadata,
             attr=attr,
             value=value,
         )
-    if attr == 'bugtracker_url':
-        warnings.warn(
-            'Using explicit parametes is deprecated and will be removed, '
-            'pass a dictionary as the value of the autosemver parameter '
-            'instead.'
-        )
-
-        if getattr(dist.metadata, '_autosmever', False):
-            dist.metadata = distutils_old_autosemver_case(
-                metadata=dist.metadata,
-                attr=attr,
-                value=value,
-            )
 
     else:
         if not isinstance(value, dict):
             value = {
-                'bugtracker_url': getattr(dist.metadata, 'bugtracker_url', ''),
+                "bugtracker_url": getattr(dist, "bugtracker_url", ""),
             }
 
-        dist.metadata = distutils_autosemver_case(
-            metadata=dist.metadata,
-            **value
-        )
+        dist.metadata = distutils_autosemver_case(metadata=dist.metadata, **value)
 
     return

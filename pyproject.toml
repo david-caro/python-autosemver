@@ -1,0 +1,6 @@
+[build-system]
+requires = ["dulwich", "setuptools", "wheel"]
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
