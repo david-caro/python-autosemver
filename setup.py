@@ -71,6 +71,7 @@ if __name__ == "__main__":
         name="autosemver",
         package_data={"": ["CHANGELOG", "AUTHORS"]},
         packages=["autosemver"],
+        python_requires=">=3.6",
         url=URL,
         version=__version__,
         entry_points={
