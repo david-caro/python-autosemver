@@ -49,6 +49,6 @@ bats tests/functional/*test.sh \
 
 echo
 echo '########## Running type check tests (visualization only)'
-mypy --install-types --non-interactive \
+mypy --install-types --non-interactive . --exclude tests/functional  \
 && mypy . --ignore-missing-imports --exclude tests/functional \
 || exit 0
