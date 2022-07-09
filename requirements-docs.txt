@@ -1,5 +1,2 @@
-Sphinx>=1.4.2
-# sphinxcontrib-napoleon - waiting for new release, see:
-#   https://github.com/sphinx-contrib/napoleon/issues/38
-git+https://github.com/sphinx-contrib/napoleon@dce30797b7a229ccebda4030f65482d501427794#egg=sphinxcontrib-napoleon
+Sphinx>=3.0
 -r requirements-build.txt
