@@ -25,7 +25,7 @@
 Autosemver
 ===========
 
-This small module provides an easy way to automatically manage the evrsion of
+This small module provides an easy way to automatically manage the version of
 your python modules by extracting information directly from the version control
 system (currently only git supported, patches welcome).
 

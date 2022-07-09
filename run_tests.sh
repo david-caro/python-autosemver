@@ -34,7 +34,7 @@ pytest \
 
 echo
 echo '########## Running import format checks'
-isort --check-only --diff . \
+isort --profile=black --check-only --diff . \
 || exit $?
 
 echo
@@ -49,5 +49,6 @@ bats tests/functional/*test.sh \
 
 echo
 echo '########## Running type check tests (visualization only)'
-mypy . --ignore-missing-imports \
+mypy --install-types --non-interactive . --exclude tests/functional  \
+&& mypy . --ignore-missing-imports --exclude tests/functional \
 || exit 0
